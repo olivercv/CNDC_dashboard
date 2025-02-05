@@ -62,7 +62,7 @@ export class LinesChartComponent implements OnInit {
         }
       },
       title: {
-        text: 'Seciones diarias en www.cndc.com',
+        text: 'Título Genérico 2',
         align: 'left'
       },
       subtitle: {

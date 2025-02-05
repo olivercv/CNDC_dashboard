@@ -37,7 +37,7 @@ export class AreaChartComponent {
           '2024 the US has 3,708 weapons compared to Russia’s 4,380.'
   },
   title: {
-      text: 'Arsenales nucleares'
+      text: 'Título Genérico 3'
   },
   subtitle: {
       text: 'Fuente: <a href="https://fas.org/issues/nuclear-weapons/status-world-nuclear-forces/" ' +
@@ -51,12 +51,12 @@ export class AreaChartComponent {
   },
   yAxis: {
       title: {
-          text: 'Estados con armas nucleares'
+          text: 'Participantes'
       }
   },
   tooltip: {
       pointFormat: '{series.name} había almacenado <b>{point.y:,.0f}</b><br/>' +
-          'ojivas en {point.x}'
+          'objetos en {point.x}'
   },
   plotOptions: {
       area: {
@@ -75,7 +75,7 @@ export class AreaChartComponent {
   },
   series: [{
       type: 'area', // Asegúrate de especificar el tipo aquí
-      name: 'USA',
+      name: 'Participante 1',
       data: [
           null, null, null, null, null, 2, 9, 13, 50, 170, 299, 438, 841,
           1169, 1703, 2422, 3692, 5543, 7345, 12298, 18638, 22229, 25540,
@@ -89,7 +89,7 @@ export class AreaChartComponent {
       ]
   }, {
       type: 'area', // Asegúrate de especificar el tipo aquí
-      name: 'USSR/Russia',
+      name: 'Participante 2',
       data: [
           null, null, null, null, null, null, null, null, null,
           1, 5, 25, 50, 120, 150, 200, 426, 660, 863, 1048, 1627, 2492,

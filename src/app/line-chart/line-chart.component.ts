@@ -17,7 +17,7 @@ export class LineChartComponent {
       type: 'spline'
     },
     title: {
-      text: 'Profundidad de la nieve en la montaña'
+      text: 'Título Genérico 4'
     },
     subtitle: {
       text: 'Datos con tiempos irregulares'
@@ -34,7 +34,7 @@ export class LineChartComponent {
     },
     yAxis: {
       title: {
-        text: 'Profundidad de la nieve (m)'
+        text: 'Profundidad'
       },
       min: 0
     },

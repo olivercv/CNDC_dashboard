@@ -16,7 +16,7 @@ export class SimpleChartComponent {
       type: 'pie'
     },
     title: {
-      text: 'Composición del huevo'
+      text: 'Título Genérico 1'
     },
     tooltip: {
       valueSuffix: '%'
