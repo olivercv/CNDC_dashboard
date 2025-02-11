@@ -1,5 +1,31 @@
-<highcharts-chart
-  [Highcharts]="Highcharts"
-  [options]="chartOptions"
-  style="width: 100%; height: 400px; display: block;">
-</highcharts-chart>
+<div>
+  <highcharts-chart
+    [Highcharts]="Highcharts"
+    [options]="chartOptions"
+    style="width: 100%; height: 400px; display: block;" class="chart-container">
+  </highcharts-chart>
+</div>
+
+<!-- <div id="sliders">
+  <label for="alpha">Alpha:</label>
+  <input
+    id="alpha"
+    type="range"
+    min="0"
+    max="90"
+    [value]="alpha"
+    (input)="onSliderChange($event, 'alpha')"
+  />
+  <span>{{ alpha }}</span>
+
+  <label for="beta">Beta:</label>
+  <input
+    id="beta"
+    type="range"
+    min="0"
+    max="90"
+    [value]="beta"
+    (input)="onSliderChange($event, 'beta')"
+  />
+  <span>{{ beta }}</span>
+</div> -->

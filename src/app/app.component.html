@@ -6,26 +6,19 @@
 
 
 
-<div class="grid gap-5">
-  <!-- Primera fila con tres columnas -->
-  <div class="grid grid-cols-4 gap-5">
-    <div class="col-span-1 rounded-md shadow-md p-4 mb-4">
-      <app-simple-chart></app-simple-chart>
-    </div>
-    <div class="col-span-2 rounded-md shadow-md p-4 mb-4">
-      <app-lines-chart></app-lines-chart>
-    </div>
-    <div class="col-span-1 rounded-md shadow-md p-4 mb-4">
-      <app-area-chart></app-area-chart>
-    </div>
-  </div>
+<router-outlet></router-outlet>
 
-  <!-- Segunda fila con una columna que ocupa el 100% del ancho -->
+
+
+
+<!-- <div class="grid gap-5">
+ 
   <div class="rounded-md shadow-md p-4 mb-4">
-    <router-outlet></router-outlet>
+    
     <app-line-chart></app-line-chart>
+    <app-pie-chart></app-pie-chart>
   </div>
-</div>
+</div> -->
 
 
 

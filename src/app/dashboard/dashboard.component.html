@@ -1,0 +1,22 @@
+
+<div class="grid gap-1 p-4 mx-auto
+          grid-cols-1 
+          sm:grid-cols-2 
+          lg:grid-cols-4 lg:grid-rows-1 !px-1">
+  
+      <!-- Columna 1 (25%) en laptops -->
+      <div class="lg:col-span-1 p-4 mb-4 shadow-md">
+        <app-tab-container [tabs]="leftTabs"></app-tab-container>
+      </div>
+
+      <!-- Columna 2 (50%) en laptops -->
+      <div class="lg:col-span-2 p-4 mb-4 shadow-md">
+        <app-tab-container [tabs]="centerTabs"></app-tab-container>
+      </div>
+
+      <!-- Columna 3 (25%) en laptops -->
+      <div class="lg:col-span-1 p-4 mb-4 shadow-md">
+        <app-tab-container [tabs]="rightTabs"></app-tab-container>
+      </div>
+  
+  </div>

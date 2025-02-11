@@ -29,14 +29,20 @@
             "styles": [
               "src/styles.css"
             ],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": [
+              "highcharts",
+              "highcharts/highcharts-3d",
+              "highcharts/highcharts-more"
+            ]
+
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "800kB",
+                  "maximumWarning": "1300kB",
                   "maximumError": "1MB"
                 },
                 {
