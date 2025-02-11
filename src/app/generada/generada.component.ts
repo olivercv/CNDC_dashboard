@@ -81,7 +81,7 @@ export class GeneradaComponent implements OnInit, OnDestroy {
                   type: 'datetime', // Usar eje X de tipo fecha/hora
                   min: baseDate.getTime(), // Hora inicial (00:00)
                   max: baseDate.getTime() + 24 * 3600 * 1000, // 24 horas después
-                  tickInterval: 3600 * 1000, // Mostrar una etiqueta cada 1 hora (en milisegundos)
+                  tickInterval: 3600 * 2000, // Mostrar una etiqueta cada 1 hora (en milisegundos)
                   labels: {
                     format: '{value:%H:%M}', // Formato 24h (ej: "00:00", "01:00", etc.)
                   },
