@@ -5,25 +5,27 @@ import { HttpClient } from '@angular/common/http';
 import { NgZone } from '@angular/core';
 
 @Component({
-  selector: 'app-generada',
+  selector: 'app-demanda',
   standalone: true,
   imports: [HighchartsChartModule],
-  templateUrl: './generada.component.html',
-  styleUrls: ['./generada.component.css']
+  templateUrl: './demanda.component.html',
+  styleUrls: ['./demanda.component.css']
 })
-export class GeneradaComponent implements OnInit, OnDestroy {
+export class DemandaComponent implements OnInit, OnDestroy {
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions!: Highcharts.Options;
   private intervalId: any;
 
-  private styles: { name: string, dashStyle: 'Solid' | 'Dash' | 'Dot', realName: string, color: string }[] = [ // Estilos personalizados
-    { name: 'PREV', dashStyle: 'Dot', realName: 'Previsto', color: "#646464" },
-    { name: 'TOT', dashStyle: 'Solid', realName: 'Total', color: "#646464" },
-    { name: 'TERMO', dashStyle: 'Solid', realName: 'Termoeléctrica', color: '#fa5734' },
-    { name: 'HIDRO', dashStyle: 'Solid', realName: 'Hidroeléctrica', color: '#3188e5' },
-    { name: 'SOLAR', dashStyle: 'Solid', realName: 'Solar', color:'#fab610' },
-    { name: 'EOL', dashStyle: 'Solid', realName: 'Eólica', color: '#2aacc1' },
-    { name: 'BAGAZO', dashStyle: 'Solid', realName: 'BAGAZO', color: '#641111' },
+  private styles: { name: string, dashStyle: 'Solid' | 'Dash' | 'Dot', realName: string, color: string }[] = [
+    { name: 'Prev.SCZ', dashStyle: 'Dot', realName: 'Prev. SCZ', color: "#0da209" },
+    { name: 'SANTA CRUZ', dashStyle: 'Solid', realName: 'Santa Cruz', color: "#086432" },
+    { name: 'LA PAZ', dashStyle: 'Solid', realName: 'La Paz', color: '#4f2783' },
+    { name: 'COCHABAMBA', dashStyle: 'Solid', realName: 'Cochabamba', color: '#3188e5' },
+    { name: 'POTOSI', dashStyle: 'Solid', realName: 'Potosí', color:'#aa1400' },
+    { name: 'ORURO', dashStyle: 'Solid', realName: 'Oruro', color: '#795548' },
+    { name: 'TARIJA', dashStyle: 'Solid', realName: 'Tarija', color: '#fa9802' },
+    { name: 'CHUQUISACA', dashStyle: 'Solid', realName: 'Chuquizaca', color: '#2782b9' },
+    { name: 'BENI', dashStyle: 'Solid', realName: 'Beni', color: '#46c864' }
   ];
 
   constructor(private http: HttpClient, private zone: NgZone) {}
@@ -49,7 +51,7 @@ export class GeneradaComponent implements OnInit, OnDestroy {
 
   fetchData() {
     const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
-    const dataApiUrl = 'https://cndcapi.cndc.bo/WebApi?code=0&Fecha=';
+    const dataApiUrl = 'https://cndcapi.cndc.bo/WebApi?code=1&Fecha=';
 
     this.http.get<any[]>(fechaApiUrl).subscribe({
       next: (fechas) => {
@@ -84,7 +86,7 @@ export class GeneradaComponent implements OnInit, OnDestroy {
                 type: 'line', 
                 scrollablePlotArea: { minWidth: 700 },
               },
-              title: { text: 'Generación de Energía', align: 'center' },
+              title: { text: 'Demanda de Energía', align: 'center' },
               subtitle: { text: `Datos en tiempo real en Fecha: ${fechaTiempoReal}` },
               xAxis: {
                 title: { text: 'Horas' },

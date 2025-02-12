@@ -5,25 +5,24 @@ import { HttpClient } from '@angular/common/http';
 import { NgZone } from '@angular/core';
 
 @Component({
-  selector: 'app-generada',
+  selector: 'app-injectada',
   standalone: true,
   imports: [HighchartsChartModule],
-  templateUrl: './generada.component.html',
-  styleUrls: ['./generada.component.css']
+  templateUrl: './injectada.component.html',
+  styleUrls: ['./injectada.component.css']
 })
-export class GeneradaComponent implements OnInit, OnDestroy {
+export class InjectadaComponent implements OnInit, OnDestroy {
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions!: Highcharts.Options;
   private intervalId: any;
 
   private styles: { name: string, dashStyle: 'Solid' | 'Dash' | 'Dot', realName: string, color: string }[] = [ // Estilos personalizados
-    { name: 'PREV', dashStyle: 'Dot', realName: 'Previsto', color: "#646464" },
-    { name: 'TOT', dashStyle: 'Solid', realName: 'Total', color: "#646464" },
-    { name: 'TERMO', dashStyle: 'Solid', realName: 'Termoeléctrica', color: '#fa5734' },
+    { name: 'TERMO', dashStyle: 'Solid', realName: 'Termoeléctrica', color: '#E3371E' },
     { name: 'HIDRO', dashStyle: 'Solid', realName: 'Hidroeléctrica', color: '#3188e5' },
     { name: 'SOLAR', dashStyle: 'Solid', realName: 'Solar', color:'#fab610' },
-    { name: 'EOL', dashStyle: 'Solid', realName: 'Eólica', color: '#2aacc1' },
-    { name: 'BAGAZO', dashStyle: 'Solid', realName: 'BAGAZO', color: '#641111' },
+    { name: 'EOL', dashStyle: 'Solid', realName: 'Eólica', color: '#103778' },
+    { name: 'BAGAZO', dashStyle: 'Solid', realName: 'BAGAZO', color: '#A6BC09' },
+    { name: 'SIS', dashStyle: 'Solid', realName: 'Total', color: '#CACACA' },
   ];
 
   constructor(private http: HttpClient, private zone: NgZone) {}
@@ -49,11 +48,11 @@ export class GeneradaComponent implements OnInit, OnDestroy {
 
   fetchData() {
     const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
-    const dataApiUrl = 'https://cndcapi.cndc.bo/WebApi?code=0&Fecha=';
+    const dataApiUrl = 'https://cndcapi.cndc.bo/WebApi?code=6&Fecha=';
 
     this.http.get<any[]>(fechaApiUrl).subscribe({
       next: (fechas) => {
-        const fechaTiempoReal = fechas.find(f => f.tipo === 'TIEMPO_REAL')?.fecha;
+        const fechaTiempoReal = fechas.find(f => f.tipo === 'POSTDESPACHO')?.fecha;
         if (!fechaTiempoReal) return;
 
         this.http.get<any[]>(dataApiUrl + fechaTiempoReal).subscribe({
@@ -67,7 +66,7 @@ export class GeneradaComponent implements OnInit, OnDestroy {
             let seriesData = data.map(item => ({
               name: item.codigo,
               data: item.valores.map((val: number, index: number) => {
-                const timestamp = baseDate.getTime() + (index * 900000); // 15 minutos en ms (15 * 60 * 1000)
+                const timestamp = baseDate.getTime() + (index * 900000 * 4); // 15 minutos en ms (15 * 60 * 1000)
                 return [timestamp, val === -1 ? null : val];
               }),
             }));
@@ -81,11 +80,11 @@ export class GeneradaComponent implements OnInit, OnDestroy {
 
             this.chartOptions = {
               chart: { 
-                type: 'line', 
+                type: 'area', 
                 scrollablePlotArea: { minWidth: 700 },
               },
-              title: { text: 'Generación de Energía', align: 'center' },
-              subtitle: { text: `Datos en tiempo real en Fecha: ${fechaTiempoReal}` },
+              title: { text: 'Energía Inyectada', align: 'center' },
+              subtitle: { text: `Datos en Fecha: ${fechaTiempoReal}` },
               xAxis: {
                 title: { text: 'Horas' },
                 type: 'datetime',
@@ -98,7 +97,7 @@ export class GeneradaComponent implements OnInit, OnDestroy {
                   color: '#ccc' // Color neutro
                 }
               },
-              yAxis: { title: { text: 'MW' } },
+              yAxis: { title: { text: 'MWh' } },
               legend: { align: 'center', verticalAlign: 'bottom' },
               tooltip: {
                 shared: true,
@@ -132,6 +131,9 @@ export class GeneradaComponent implements OnInit, OnDestroy {
                       chart.redraw();
                     }
                   }
+                },
+                area: {
+                  fillOpacity: 0.5
                 }
               },
               boost: {
@@ -142,7 +144,7 @@ export class GeneradaComponent implements OnInit, OnDestroy {
               series: seriesData.map(item => {
                 const style = this.styles.find(s => s.name === item.name) || { dashStyle: 'Solid', realName: item.name, color: '#000000' };
                 return {
-                  type: 'line',
+                  type: 'area',
                   name: style.realName,
                   data: item.data,
                   color: style.color, // Asignar color desde el objeto de estilos

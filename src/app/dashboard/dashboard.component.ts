@@ -6,6 +6,10 @@ import { PieChartComponent } from '../pie-chart/pie-chart.component';
 import { LinesChartComponent } from '../lines-chart/lines-chart.component';
 import { TabContainerComponent } from '../tab-container/tab-container.component';
 import { GeneradaComponent } from '../generada/generada.component';
+import { DemandaComponent } from '../demanda/demanda.component';
+import { InjectadaComponent } from '../injectada/injectada.component';
+import { CostoMarginalRealComponent } from '../costo-marginal-real/costo-marginal-real.component';
+import { FrecuenciaComponent } from '../frecuencia/frecuencia.component';
 
 
 
@@ -20,20 +24,21 @@ export class DashboardComponent {
 
   // Tabs de la columna izquierda
   leftTabs = [
-    { label: 'Capacidad Efectiva', component: PieChartComponent },
-    { label: 'Frecuencia', component: SimpleChartComponent }
+    { label: 'Frecuencia', component: FrecuenciaComponent },
+    { label: 'Capacidad Efectiva', component: PieChartComponent }
+    
   ];
 
   // Tabs de la columna central
   centerTabs = [
     { label: 'Generacion de Energía', component: GeneradaComponent },
-    { label: 'Demanda de Energía', component: LineChartComponent }
+    { label: 'Demanda de Energía', component: DemandaComponent }
   ];
 
   // Tabs de la columna derecha
   rightTabs = [
-    { label: 'Energia Inyectada', component: AreaChartComponent },
-    { label: 'Gráfico Simple', component: SimpleChartComponent }
+    { label: 'Energia Inyectada', component: InjectadaComponent },
+    { label: 'Costo Marginal', component: CostoMarginalRealComponent }
   ];
 
 
