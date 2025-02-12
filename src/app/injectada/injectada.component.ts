@@ -106,36 +106,20 @@ export class InjectadaComponent implements OnInit, OnDestroy {
                 animation: false // Desactiva animaciones innecesarias
               },
               plotOptions: {
-                series: {
-                  stickyTracking: false,
-                  marker: {
-                    enabled: false // Desactiva marcadores si no son críticos
-                  },
-                  events: {
-                    mouseOver: function () {
-                      const chart = this.chart;
-                      chart.series.forEach(s => {
-                        if (s !== this) {
-                          s.update({ opacity: 0.2, type: s.type as any }, false); // Atenuar otras series
-                        }
-                      });
-                      chart.redraw();
-                    },
-                    mouseOut: function () {
-                      const chart = this.chart;
-                      chart.series.forEach(s => {
-                        if (s !== this) {
-                          s.update({ opacity: 1, type: s.type as any }, false); // Restaurar opacidad
-                        }
-                      });
-                      chart.redraw();
-                    }
-                  }
-                },
                 area: {
-                  fillOpacity: 0.5
+                    pointStart: 1940,
+                    marker: {
+                        enabled: false,
+                        symbol: 'circle',
+                        radius: 2,
+                        states: {
+                            hover: {
+                                enabled: true
+                            }
+                        }
+                    }
                 }
-              },
+            },
               boost: {
                 enabled: true,
                 useGPUTranslations: true,
