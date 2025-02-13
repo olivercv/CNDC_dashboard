@@ -1,0 +1,50 @@
+/* Estilo para el mapa SVG */
+svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none; /* Evita interacción con los elementos ocultos */
+}
+.btn {
+stroke: #FFF;
+stroke-width: 2;
+}
+.btn:hover{
+stroke: #ffffff;
+cursor:pointer;
+}
+
+.transparent-button {
+opacity: 0.5; /* 50% de opacidad */
+}
+
+/* Estilo del globo informativo */
+.tooltip {
+  font-family: 'Arial';
+  position: absolute;
+  background-color: rgba(255, 255, 255, 0.95);
+  color: black;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-size: 14px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  border: 1.5px solid #999;
+}
+.circle {
+stroke: #FFF; /* Color del borde */
+stroke-width: 2; /* Grosor del borde */
+fill-opacity: 0.8;
+transition: fill 0.3s, stroke 0.3s; /* Animación suave */
+}
+.circle:hover {
+fill-opacity: 1;
+stroke: #ffffff;
+cursor:pointer;
+}

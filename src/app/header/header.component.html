@@ -1,16 +1,33 @@
+<!-- Banner con menú -->
+<div class="bg-blue-800 shadow-md !py-4 !mb-4">
+  <div class="container mx-auto flex justify-between items-center !px-4">
+    <!-- Título -->
+    <h2 class="text-xl text-blue-50 font-bold">Dashboard CNDC</h2>
 
-<header class="bg-gray-100 shadow">
-  <div class="contain-content mx-auto px-4 py-2 flex justify-between items-center">
-    <div>
-      <h1 class="text-xl font-bold" >Dashboard</h1>
-    </div>
-    <div class="flex items-center space-x-4">
-      <input type="text" pleaceholder="Buscar ..." class="border rounded px-2 py-1">
-      <button class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-1 px-2 rounded" >Item</button>
-    </div>
-    <div class="flex relative ">
-      <img src="../assets/angular.jpg" alt="" class="w-8 h-8 rounded-full mr-2">
-      <button class="flex items-center">Perfil</button>
-    </div>
+    <!-- Menú horizontal -->
+    <nav class="flex space-x-6">
+      <a
+        (click)="navigateTo('/dashboard')"
+        routerLinkActive="text-blue-300 underline"
+        class="text-blue-50 hover:text-blue-200 transition duration-300 !py-2 !px-4 rounded-lg hover:bg-blue-700"
+      >
+        Dashboard
+      </a>
+      <a
+        (click)="navigateTo('/map-centrales')"
+
+        routerLinkActive="text-blue-300 underline"
+        class="text-blue-50 hover:text-blue-200 transition duration-300 !py-2 !px-4 rounded-lg hover:bg-blue-700"
+      >
+        Map Centrales
+      </a>
+      <a
+        (click)="navigateTo('/map-transmision')"
+        routerLinkActive="text-blue-300 underline"
+        class="text-blue-50 hover:text-blue-200 transition duration-300 !py-2 !px-4 rounded-lg hover:bg-blue-700"
+      >
+        Map Transmisiones
+      </a>
+    </nav>
   </div>
-</header>
+</div>

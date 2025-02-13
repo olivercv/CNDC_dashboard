@@ -1,10 +1,12 @@
 import { Routes } from '@angular/router';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { CostoMarginalRealComponent } from './costo-marginal-real/costo-marginal-real.component';
+import { MapCentralesComponent } from './map-centrales/map-centrales.component';
+import { MapTransmisionComponent } from './map-transmision/map-transmision.component';
 
 export const routes: Routes = [
 
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent },
-  { path: 'costo', component: CostoMarginalRealComponent },
+  { path: 'map-centrales', component: MapCentralesComponent },
+  { path: 'map-transmision', component: MapTransmisionComponent },
 ];
