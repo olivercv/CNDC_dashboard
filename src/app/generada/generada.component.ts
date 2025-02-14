@@ -117,7 +117,7 @@ export class GeneradaComponent implements OnInit, OnDestroy {
                       const chart = this.chart;
                       chart.series.forEach(s => {
                         if (s !== this) {
-                          s.update({ opacity: 0.2, type: s.type as any }, false); // Atenuar otras series
+                          s.update({ opacity: 0.4, type: s.type as any }, false); // Atenuar otras series
                         }
                       });
                       chart.redraw();

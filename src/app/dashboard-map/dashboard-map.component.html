@@ -1,0 +1,17 @@
+<div class="grid gap-1 p-4 mx-auto
+            grid-cols-1 
+            sm:grid-cols-2 
+            lg:grid-cols-3 lg:grid-rows-1 
+            !px-1 items-stretch min-h-[500px]">
+  
+  <!-- Columna 1 -->
+  <div class="lg:col-span-2 grid h-full">
+    <app-tab-container class="h-full w-full" [tabs]="leftTabs"></app-tab-container>
+  </div>
+
+  <!-- Columna 2 -->
+  <div class="lg:col-span-1 grid h-full">
+    <app-tab-container class="h-full w-full" [tabs]="rightTabs"></app-tab-container>
+  </div>
+
+</div>

@@ -58,18 +58,18 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
     const seriesData: any = [{
       name: data.codigo,
       type: 'spline',
-      lineWidth: 2, // Grosor de línea aumentado
+      lineWidth: 3, // Grosor de línea aumentado
       data: data.valores.map((val: number, index: number) => {
         const timestamp = baseDate.getTime() + (index * 3600000); // Intervalos de 1 hora
         return [timestamp, val];
       }),
       marker: {
-        enabled: true, // Asegurar que los marcadores estén habilitados
+        enabled: false, // Asegurar que los marcadores estén habilitados
         symbol: 'circle',
-        radius: 4, // Tamaño aumentado
+        radius: 1, // Tamaño aumentado
         fillColor: '#FFFFFF',
         lineColor: '#058DC7', // Color del borde igual a la serie
-        lineWidth: 2
+        lineWidth: 1
       }
     }];
 
@@ -113,7 +113,37 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
           text: 'Frecuencia (Hz)'
         },
         min: minY,
-        max: maxY
+        max: maxY,
+        plotLines: [
+          {
+            color: 'red', // Color de la línea
+            dashStyle: 'Dash', // Línea segmentada (con D mayúscula)
+            width: 2, // Grosor de la línea
+            value: 50, // Altura de la línea
+            label: {
+              text: '50 Hz',
+              align: 'right',
+              style: {
+                color: 'red',
+                fontWeight: 'bold'
+              }
+            }
+          },
+          {
+            color: 'red',
+            dashStyle: 'Dash',
+            width: 2,
+            value: 50.7,
+            label: {
+              text: '50.7 Hz',
+              align: 'right',
+              style: {
+                color: 'red',
+                fontWeight: 'bold'
+              }
+            }
+          }
+        ]
       },
       tooltip: {
         shared: true,

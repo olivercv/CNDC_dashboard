@@ -2,6 +2,9 @@
   border: 1px solid #ccc;
   border-radius: 8px;
   overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  /* padding: 4px; */
+  margin-bottom: 4px;
 }
 
 .tab-headers {
@@ -17,6 +20,15 @@
   background: #ddd;
   font-weight: bold;
   transition: background 0.3s;
+  
+}
+
+.tab-button:first-child {
+  border-radius: 8px 0px 0px 0px;
+}
+
+.tab-button:last-child {
+  border-radius: 0px 8px 0px 0px;
 }
 
 .tab-button.active {
@@ -27,4 +39,5 @@
 .tab-content {
   padding: 15px;
   background: white;
+  min-height: 530px;
 }
