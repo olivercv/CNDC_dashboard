@@ -3,11 +3,12 @@ import { Component, OnInit } from '@angular/core';
 type RegionKey = 'norte' | 'este' | 'sur';
 
 @Component({
-  selector: 'app-map-transmision',
-  templateUrl: './map-transmision.component.html',
-  styleUrls: ['./map-transmision.component.css']
+  selector: 'app-map-transferencias',
+  imports: [],
+  templateUrl: './map-transferencias.component.html',
+  styleUrl: './map-transferencias.component.css'
 })
-export class MapTransmisionComponent implements OnInit {
+export class MapTransferenciasComponent implements OnInit {
 
   data = {
     "lines": [
@@ -162,7 +163,6 @@ export class MapTransmisionComponent implements OnInit {
   initMap(): void {
     const tooltip = document.getElementById('tooltip');
     const svg = document.getElementById('map-svg');
-
     if (!tooltip || !svg) {
       console.error('No se encontró el tooltip o el SVG en el DOM.');
       return;
@@ -170,17 +170,16 @@ export class MapTransmisionComponent implements OnInit {
 
     this.data.lines.forEach(line => {
       const { id, start, end, info, inject, animation } = line;
-
       const isInverted = animation.invert;
       const animationStart = isInverted ? end : start;
       const animationEnd = isInverted ? start : end;
 
       const lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
       lineElement.setAttribute("id", id);
-      lineElement.setAttribute("x1", animationStart.x.toString());
-      lineElement.setAttribute("y1", animationStart.y.toString());
-      lineElement.setAttribute("x2", animationEnd.x.toString());
-      lineElement.setAttribute("y2", animationEnd.y.toString());
+      lineElement.setAttribute("x1", start.x.toString());
+      lineElement.setAttribute("y1", start.y.toString());
+      lineElement.setAttribute("x2", end.x.toString());
+      lineElement.setAttribute("y2", end.y.toString());
       lineElement.setAttribute("class", "line");
       lineElement.setAttribute("stroke", "gray");
       lineElement.setAttribute("stroke-width", "5");
@@ -201,47 +200,37 @@ export class MapTransmisionComponent implements OnInit {
         tooltip.style.opacity = '0';
       });
 
-      const calculatePointOnLine = (t: number) => {
-        const x = animationStart.x + t * (animationEnd.x - animationStart.x);
-        const y = animationStart.y + t * (animationEnd.y - animationStart.y);
-        return { x, y };
-      };
+      const triangleGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
+      const numTriangles = 3;
 
-      const circleGroup = document.createElementNS("http://www.w3.org/2000/svg", "g");
-      const numCircles = 3;
+      for (let i = 0; i < numTriangles; i++) {
+        const t = i / (numTriangles - 1);
+        const { x, y } = this.calculatePointOnLine(animationStart, animationEnd, t);
+        const triangle = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+        triangle.setAttribute("points", "-1.666,-2.5 3.333,0 -1.666,2.5"); // Triángulo centrado
+        triangle.setAttribute("fill", "yellow");
 
-      for (let i = 0; i < numCircles; i++) {
-        const t = i / (numCircles - 1);
-        const { x, y } = calculatePointOnLine(t);
+        // Calcular el ángulo de rotación
+        const angle = this.calculateAngle(start, end, isInverted);
 
-        const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-        circle.setAttribute("r", "2");
-        circle.setAttribute("fill", "yellow");
-        circle.setAttribute("cx", x.toString());
-        circle.setAttribute("cy", y.toString());
+        // Aplicar la rotación y la traslación
+        triangle.setAttribute("transform", `translate(${x},${y}) rotate(${angle})`);
 
-        const animateX = document.createElementNS("http://www.w3.org/2000/svg", "animate");
-        animateX.setAttribute("attributeName", "cx");
-        animateX.setAttribute("values", `${animationStart.x};${animationEnd.x}`);
-        animateX.setAttribute("keyTimes", "0;1");
-        animateX.setAttribute("dur", animation.duration);
-        animateX.setAttribute("begin", animation.begin[i]);
-        animateX.setAttribute("repeatCount", "indefinite");
+        // Animación de traslación
+        const animateTranslate = document.createElementNS("http://www.w3.org/2000/svg", "animateTransform");
+        animateTranslate.setAttribute("attributeName", "transform");
+        animateTranslate.setAttribute("type", "translate");
+        animateTranslate.setAttribute("from", `${animationStart.x} ${animationStart.y}`);
+        animateTranslate.setAttribute("to", `${animationEnd.x} ${animationEnd.y}`);
+        animateTranslate.setAttribute("dur", animation.duration);
+        animateTranslate.setAttribute("begin", animation.begin[i]);
+        animateTranslate.setAttribute("repeatCount", "indefinite");
+        triangle.appendChild(animateTranslate);
 
-        const animateY = document.createElementNS("http://www.w3.org/2000/svg", "animate");
-        animateY.setAttribute("attributeName", "cy");
-        animateY.setAttribute("values", `${animationStart.y};${animationEnd.y}`);
-        animateY.setAttribute("keyTimes", "0;1");
-        animateY.setAttribute("dur", animation.duration);
-        animateY.setAttribute("begin", animation.begin[i]);
-        animateY.setAttribute("repeatCount", "indefinite");
-
-        circle.appendChild(animateX);
-        circle.appendChild(animateY);
-        circleGroup.appendChild(circle);
+        triangleGroup.appendChild(triangle);
       }
 
-      svg.appendChild(circleGroup);
+      svg.appendChild(triangleGroup);
     });
 
     const predefinedCircles: { cx: number; cy: number; r: number }[] = [
@@ -267,9 +256,21 @@ export class MapTransmisionComponent implements OnInit {
     });
   }
 
+  calculateAngle(start: { x: number, y: number }, end: { x: number, y: number }, invert: boolean): number {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const angle = Math.atan2(dy, dx) * (180 / Math.PI); // Ángulo en grados
+    return invert ? angle + 180 : angle; // Invertir el ángulo si es necesario
+  }
+
+  calculatePointOnLine(start: { x: number, y: number }, end: { x: number, y: number }, t: number): { x: number, y: number } {
+    const x = start.x + t * (end.x - start.x);
+    const y = start.y + t * (end.y - start.y);
+    return { x, y };
+  }
+
   addHoverEffects(): void {
     const svg = document.getElementById('map-svg');
-
     if (!svg) {
       console.error('No se encontró el SVG en el DOM.');
       return;
@@ -294,7 +295,6 @@ export class MapTransmisionComponent implements OnInit {
 
   changeRegionColor(className: RegionKey, color: string): void {
     const paths = document.querySelectorAll(`g.${className} path`);
-
     paths.forEach(path => {
       (path as SVGPathElement).setAttribute('fill', color);
     });

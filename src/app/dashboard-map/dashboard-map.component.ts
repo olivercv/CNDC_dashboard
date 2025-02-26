@@ -4,7 +4,7 @@ import { GeneradaComponent } from '../generada/generada.component';
 import { DemandaComponent } from '../demanda/demanda.component';
 import { FrecuenciaComponent } from '../frecuencia/frecuencia.component';
 import { MapCentralesComponent } from '../map-centrales/map-centrales.component';
-import { MapTransmisionComponent } from '../map-transmision/map-transmision.component';
+import { MapTransferenciasComponent } from '../map-transferencias/map-transferencias.component';
 
 @Component({
   selector: 'app-dashboard-map',
@@ -24,7 +24,7 @@ export class DashboardMapComponent {
     // Tabs de la columna derecha
     rightTabs = [
       { label: 'Centrales', component: MapCentralesComponent },
-      { label: 'Transmisión', component: MapTransmisionComponent }
+      { label: 'Transferencias', component: MapTransferenciasComponent }
     ];
 
 }

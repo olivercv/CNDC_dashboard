@@ -8,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 export class MapCentralesComponent implements OnInit {
 
   circleData = [
-    { "cx": 337.24, "cy": 306.70, "r": 7, "fill": "#ff3131", "class": "circle red", "dataInfo": "Generador A - Potencia Injectada: 2.000 KW/h" },
+    { "cx": 337.24, "cy": 306.70, "r": 7, "fill": "#ff3131", "class": "circle red", "dataInfo": "Generador A - Potencia Activa: 2.000 MW - Potencia reactiva: 9000 Mvar - Capacidad instalada: 2.800 MW" },
           { "cx": 210.73, "cy": 298.18, "r": 7, "fill": "#ff3131", "class": "circle red", "dataInfo": "Generador B" },
           { "cx": 175.35, "cy": 395.38, "r": 7, "fill": "#ff3131", "class": "circle red", "dataInfo": "Generador C" },
           { "cx": 289.64, "cy": 475.68, "r": 7, "fill": "#ff3131", "class": "circle red", "dataInfo": "Generador D" },
@@ -75,7 +75,7 @@ export class MapCentralesComponent implements OnInit {
         if (target.tagName === 'circle') {
           const info = target.getAttribute('data-info');
           if (info) {
-            tooltip.innerHTML = `<b>${info.split(' - ')[0]}</b><br>${info.split(' - ')[1] || ''}`;
+            tooltip.innerHTML = `<b>${info.split(' - ')[0]}</b><br>${info.split(' - ')[1]} <br> ${info.split(' - ')[2]} <br> ${info.split(' - ')[3] || ''}`;
             tooltip.style.opacity = '1';
           }
         }
