@@ -160,7 +160,8 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
         }
       },
       colors: ['#058DC7'],
-      series: seriesData
+      series: seriesData,
+      credits: { enabled: false },
     };
   }
 }

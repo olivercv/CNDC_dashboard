@@ -141,6 +141,7 @@ export class DemandaComponent implements OnInit, OnDestroy {
                 useGPUTranslations: true,
                 allowForce: true
               },
+              credits: { enabled: false },
               series: seriesData.map(item => {
                 const style = this.styles.find(s => s.name === item.name) || { dashStyle: 'Solid', realName: item.name, color: '#000000' };
                 return {
