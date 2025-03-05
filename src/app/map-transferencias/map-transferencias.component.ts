@@ -16,7 +16,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "cb-lp",
         "start": {"x": 169, "y": 387},
         "end": {"x": 283, "y": 464.5},
-        "inject": "355.020 Kwh",
+        "inject": "355.020 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea Cochabamba - La Paz",
         "animation": {
             "duration": "2s",
@@ -28,7 +30,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "lp-or",
         "start": {"x": 167, "y": 390},
         "end": {"x": 226.5, "y": 497.5},
-        "inject": "55.520 Kwh",
+        "inject": "55.520 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea La Paz - Oruro",
         "animation": {
             "duration": "2s",
@@ -40,7 +44,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "lp-tr",
         "start": {"x": 167, "y": 386},
         "end": {"x": 333.5, "y": 293.5},
-        "inject": "20.200 Kwh",
+        "inject": "20.200 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea La Paz - Trinidad",
         "animation": {
             "duration": "2s",
@@ -52,7 +58,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "cb-sc",
         "start": {"x": 288, "y": 467},
         "end": {"x": 474, "y": 515},
-        "inject": "425.010 Kwh",
+        "inject": "425.010 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea Cochabamba - Santa Cruz",
         "animation": {
             "duration": "2s",
@@ -65,6 +73,8 @@ export class MapTransferenciasComponent implements OnInit {
         "start": {"x": 287, "y": 467},
         "end": {"x": 227, "y": 497},
         "inject": "165.080 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea Cochabamba - Oruro",
         "animation": {
             "duration": "1s",
@@ -76,7 +86,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "cb-pt",
         "start": {"x": 287, "y": 467},
         "end": {"x": 293, "y": 582},
-        "inject": "135.010 Kwh",
+        "inject": "135.010 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea Cochabamba - Potosí",
         "animation": {
             "duration": "2s",
@@ -88,7 +100,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "cb-ch",
         "start": {"x": 287, "y": 467},
         "end": {"x": 355, "y": 558},
-        "inject": "105.090 Kwh",
+        "inject": "105.090 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea Cochabamba - Sucre",
         "animation": {
             "duration": "2s",
@@ -100,7 +114,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "or-pt",
         "start": {"x": 227, "y": 497},
         "end": {"x": 293, "y": 582},
-        "inject": "35.500 Kwh",
+        "inject": "35.500 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea Oruro - Potosí",
         "animation": {
             "duration": "2s",
@@ -112,7 +128,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "pt-ch",
         "start": {"x": 293, "y": 582},
         "end": {"x": 355, "y": 558},
-        "inject": "25.420 Kwh",
+        "inject": "25.420 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea Potosí - Sucre",
         "animation": {
             "duration": "1s",
@@ -124,7 +142,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "pt-ta",
         "start": {"x": 293, "y": 582},
         "end": {"x": 363, "y": 682.5},
-        "inject": "135.300 Kwh",
+        "inject": "135.300 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea Potosí - Tarija",
         "animation": {
             "duration": "2s",
@@ -136,7 +156,9 @@ export class MapTransferenciasComponent implements OnInit {
         "id": "sc-tr",
         "start": {"x": 476.5, "y": 515},
         "end": {"x": 333.5, "y": 293.5},
-        "inject": "355.020 Kwh",
+        "inject": "355.020 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
         "info": "Línea Santa Cruz - Trinidad",
         "animation": {
             "duration": "2s",
@@ -144,6 +166,7 @@ export class MapTransferenciasComponent implements OnInit {
             "begin": ["0s", "0.2s", "0.4s"]
         }
     }
+      
     ]
   };
 
@@ -169,7 +192,7 @@ export class MapTransferenciasComponent implements OnInit {
     }
 
     this.data.lines.forEach(line => {
-      const { id, start, end, info, inject, animation } = line;
+      const { id, start, end, info, inject, flujo_activo, flujo_reactivo, animation } = line;
       const isInverted = animation.invert;
       const animationStart = isInverted ? end : start;
       const animationEnd = isInverted ? start : end;
@@ -187,7 +210,7 @@ export class MapTransferenciasComponent implements OnInit {
       svg.appendChild(lineElement);
 
       lineElement.addEventListener('mouseover', (event) => {
-        tooltip.innerHTML = `<b>${inject}</b>`;
+        tooltip.innerHTML = `<b>${inject}</b> <br><b>Flujo Activo : </b>${flujo_activo}<br><b>Flujo Reactivo : </b>${flujo_reactivo}`;
         tooltip.style.opacity = '1';
       });
 

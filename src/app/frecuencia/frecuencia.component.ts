@@ -1,6 +1,13 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
+// Importar módulos necesarios
+import HighchartsMore from 'highcharts/highcharts-more';
+import HighchartsExporting from 'highcharts/modules/exporting';
+
+// Inicializar módulos
+if (typeof HighchartsExporting === 'function') {  HighchartsExporting(Highcharts); }
+if (typeof HighchartsMore === 'function') { HighchartsMore(Highcharts); } 
 
 @Component({
   selector: 'app-frecuencia',
