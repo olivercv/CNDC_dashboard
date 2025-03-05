@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 
@@ -13,26 +13,15 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions!: Highcharts.Options;
   private intervalId: any;
+  private dataPoints: number[][] = [];
+  private readonly maxSeconds = 50;
 
-  // Datos proporcionados
-  private datos_json = [
-    {
-      "codigo": "Frecuencia",
-      "max": 50.7,
-      "min": 49.75,
-      "fecha": "2025-01-05T00:00:00",
-      "valores": [
-        50.18, 50.18, 50.33, 50.33, 50.33, 50.33, 50.1, 50.1, 50.18, 50.37, 
-        50.38, 50.4, 50.4, 50.38, 50.18, 50.18, 50.18, 50.17, 50.33, 50.26, 
-        50.62, 50.74, 50.72, 50.18
-      ]
-    }
-  ];
-
-  constructor() {}
+  constructor(private cdr: ChangeDetectorRef) {
+    this.initializeHistoricalData();
+  }
 
   ngOnInit() {
-    this.fetchData();
+    this.initializeChart();
     this.startAutoRefresh();
   }
 
@@ -40,128 +29,113 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
     this.stopAutoRefresh();
   }
 
-  startAutoRefresh() {
-    // this.zone.runOutsideAngular(() => {
-    //   this.intervalId = setInterval(() => this.fetchData(), 15000);
-    // });
+  private initializeHistoricalData() {
+    const now = Date.now();
+    // Crear 50 puntos históricos estáticos
+    for (let i = 0; i < this.maxSeconds; i++) {
+      this.dataPoints.push([
+        now - (this.maxSeconds - i) * 1000,
+        Number((Math.random() * (50.8 - 49.7) + 49.7).toFixed(2))
+      ]);
+    }
   }
 
-  stopAutoRefresh() {
-    if (this.intervalId) clearInterval(this.intervalId);
+  private initializeChart() {
+    this.chartOptions = this.buildChartOptions();
   }
 
-  fetchData() {
-    const data = this.datos_json[0];
-    const baseDate = new Date(data.fecha);
-    baseDate.setUTCHours(0, 0, 0, 0); // Fijar a medianoche en UTC
-
-    const seriesData: any = [{
-      name: data.codigo,
-      type: 'spline',
-      lineWidth: 3, // Grosor de línea aumentado
-      data: data.valores.map((val: number, index: number) => {
-        const timestamp = baseDate.getTime() + (index * 3600000); // Intervalos de 1 hora
-        return [timestamp, val];
-      }),
-      marker: {
-        enabled: false, // Asegurar que los marcadores estén habilitados
-        symbol: 'circle',
-        radius: 1, // Tamaño aumentado
-        fillColor: '#FFFFFF',
-        lineColor: '#058DC7', // Color del borde igual a la serie
-        lineWidth: 1
-      }
-    }];
-
-    this.updateChart(seriesData, data.fecha, baseDate, data.min, data.max);
+  private getLiveDataPoint(): number[] {
+    return [Date.now(), Number((Math.random() * (50.8 - 49.7) + 49.7).toFixed(2))];
   }
 
-  private updateChart(seriesData: Highcharts.SeriesOptionsType[], fecha: string, baseDate: Date, minY: number, maxY: number) {
-    this.chartOptions = {
+  private updateChartData() {
+    const newPoint = this.getLiveDataPoint();
+    
+    // Mantener histórico + nuevo punto
+    this.dataPoints = [
+      ...this.dataPoints.slice(1),  // Conservar todos excepto el más antiguo
+      newPoint                      // Añadir nuevo punto
+    ];
+  }
+
+  private buildChartOptions(): Highcharts.Options {
+    return {
       chart: {
         type: 'spline',
-        scrollablePlotArea: { minWidth: 300 }
+        animation: true,
+        events: {
+          load: () => this.handleChartLoad()
+        }
       },
       title: {
-        text: 'Frecuencia'
-      },
-      subtitle: {
-        text: `Fecha: ${fecha}`
+        text: 'Frecuencia en Tiempo Real',
+        style: {
+          fontSize: '20px',
+          color: '#2c3e50'
+        }
       },
       xAxis: {
         type: 'datetime',
-        dateTimeLabelFormats: {
-          hour: '%H:%M',
-          day: '%e. %b'
-        },
-        title: {
-          text: 'Hora'
-        },
-        min: baseDate.getTime(), // Inicio a las 00:00
-        max: baseDate.getTime() + 86399999, // Fin a las 23:59:59.999
-        tickInterval: 3600000 * 4, // Cada 3 horas
+        min: this.dataPoints[0][0],
+        max: this.dataPoints[this.dataPoints.length - 1][0],
         labels: {
           formatter: function() {
-            // Asegurarse de que this.value sea tratado como número
-            const timestamp = typeof this.value === 'string' ? parseFloat(this.value) : this.value;
-            return Highcharts.dateFormat('%H:%M', timestamp);
+            return Highcharts.dateFormat('%H:%M:%S', this.value as number);
           }
         }
       },
       yAxis: {
-        title: {
-          text: 'Frecuencia (Hz)'
-        },
-        min: minY,
-        max: maxY,
-        plotLines: [
-          {
-            color: 'red', // Color de la línea
-            dashStyle: 'Dash', // Línea segmentada (con D mayúscula)
-            width: 2, // Grosor de la línea
-            value: 50, // Altura de la línea
-            label: {
-              text: '50 Hz',
-              align: 'right',
-              style: {
-                color: 'red',
-                fontWeight: 'bold'
-              }
-            }
-          },
-          {
-            color: 'red',
-            dashStyle: 'Dash',
-            width: 2,
-            value: 50.7,
-            label: {
-              text: '50.7 Hz',
-              align: 'right',
-              style: {
-                color: 'red',
-                fontWeight: 'bold'
-              }
-            }
-          }
-        ]
+        title: { text: 'Hz' },
+        min: 49.5,
+        max: 50.9,
+        plotLines: this.getReferenceLines()
       },
+      series: [{
+        name: 'Frecuencia',
+        type: 'spline',
+        data: this.dataPoints,
+        color: '#3498db',
+        lineWidth: 2,
+        marker: { enabled: false }
+      }],
       tooltip: {
-        shared: true,
-        headerFormat: '<b>{point.key:%H:%M}</b><br/>',
-        pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y:.2f}</b> Hz<br/>',
-        animation: true
+        valueDecimals: 2,
+        headerFormat: '<small>{point.key:%H:%M:%S}</small><br>',
+        pointFormat: '<b>{point.y} Hz</b>'
       },
-      plotOptions: {
-        spline: {
-          marker: {
-            enabledThreshold: 0
-          },
-          lineWidth: 2 // Grosor de línea consistente
-        }
-      },
-      colors: ['#058DC7'],
-      series: seriesData,
-      credits: { enabled: false },
+      credits: { enabled: false }
     };
+  }
+
+  private getReferenceLines(): Highcharts.AxisPlotLinesOptions[] {
+    return [{
+      value: 50,
+      color: '#e74c3c',
+      width: 2,
+      dashStyle: 'Dash',
+      label: { text: '50 Hz' }
+    }, {
+      value: 50.7,
+      color: '#e74c3c',
+      width: 2,
+      dashStyle: 'Dash',
+      label: { text: '50.7 Hz' }
+    }];
+  }
+
+  private handleChartLoad() {
+    setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
+  }
+
+  startAutoRefresh() {
+    this.intervalId = setInterval(() => {
+      this.updateChartData();
+      this.chartOptions = this.buildChartOptions();
+      this.cdr.detectChanges();
+    }, 1000);
+  }
+
+  stopAutoRefresh() {
+    if (this.intervalId) clearInterval(this.intervalId);
   }
 }
