@@ -69,9 +69,18 @@ g.norte path {
   transition: fill 0.3s ease; /* Transición suave */
 }
 
+g.norte text {
+  fill: rgba(255, 255, 255, 0);
+  transition: fill 0.3s ease;
+}
 
 g.este path {
   fill: #d9d9d9; /* Color inicial para el grupo este */
+  transition: fill 0.3s ease;
+}
+
+g.este text {
+  fill: rgba(255, 255, 255, 0);
   transition: fill 0.3s ease;
 }
 
@@ -79,9 +88,17 @@ g.oeste path {
   fill: #d9d9d9; /* Color inicial para el grupo este */
   transition: fill 0.3s ease;
 }
+g.oeste text {
+  fill: rgba(255, 255, 255, 0);
+  transition: fill 0.3s ease;
+}
 
 g.sur path {
   fill: #d9d9d9; /* Color inicial para el grupo sur */
+  transition: fill 0.3s ease;
+}
+g.sur text {
+  fill: rgba(255, 255, 255, 0);
   transition: fill 0.3s ease;
 }
 
@@ -90,13 +107,31 @@ g.norte:hover path {
   fill: #D2D2C8; /* Color al hacer hover en el grupo norte */
 }
 
+g.norte:hover text {
+  fill: #FFFFFF;
+  transition: fill 0.3s ease;
+}
+
 g.este:hover path {
   fill: #CDD5C6; /* Color al hacer hover en el grupo este */
 }
+g.este:hover text {
+  fill: #FFFFFF;
+  transition: fill 0.3s ease;
+}
+
 g.oeste:hover path {
   fill: #E0E2D7; /* Color al hacer hover en el grupo este */
+}
+g.oeste:hover text {
+  fill: #FFFFFF;
+  transition: fill 0.3s ease;
 }
 
 g.sur:hover path {
   fill: #E8D4C6; /* Color al hacer hover en el grupo sur */
+}
+g.sur:hover text {
+  fill: #FFFFFF;
+  transition: fill 0.3s ease;
 }

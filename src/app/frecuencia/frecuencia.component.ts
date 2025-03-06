@@ -2,12 +2,12 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 // Importar módulos necesarios
-import HighchartsMore from 'highcharts/highcharts-more';
-import HighchartsExporting from 'highcharts/modules/exporting';
+// import HighchartsMore from 'highcharts/highcharts-more';
+// import HighchartsExporting from 'highcharts/modules/exporting';
 
-// Inicializar módulos
-if (typeof HighchartsExporting === 'function') {  HighchartsExporting(Highcharts); }
-if (typeof HighchartsMore === 'function') { HighchartsMore(Highcharts); } 
+// // Inicializar módulos
+// if (typeof HighchartsExporting === 'function') {  HighchartsExporting(Highcharts); }
+// if (typeof HighchartsMore === 'function') { HighchartsMore(Highcharts); } 
 
 @Component({
   selector: 'app-frecuencia',
@@ -101,7 +101,7 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
         name: 'Frecuencia',
         type: 'spline',
         data: this.dataPoints,
-        color: '#3498db',
+        color: '#59D986',
         lineWidth: 2,
         marker: { enabled: false }
       }],
@@ -115,19 +115,28 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   }
 
   private getReferenceLines(): Highcharts.AxisPlotLinesOptions[] {
-    return [{
+    return [
+    {
       value: 50,
-      color: '#e74c3c',
+      color: '#2C6CBF',
       width: 2,
-      dashStyle: 'Dash',
+      dashStyle: 'Dot',
       label: { text: '50 Hz' }
     }, {
       value: 50.7,
-      color: '#e74c3c',
+      color: '#D92211',
       width: 2,
-      dashStyle: 'Dash',
+      dashStyle: 'Dot',
       label: { text: '50.7 Hz' }
-    }];
+    },
+    {
+      value: 49.75,
+      color: '#D92211',
+      width: 2,
+      dashStyle: 'Dot',
+      label: { text: '49.75 Hz' }
+    }
+  ];
   }
 
   private handleChartLoad() {

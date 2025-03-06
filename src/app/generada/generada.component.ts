@@ -23,7 +23,7 @@ export class GeneradaComponent implements OnInit, OnDestroy {
     { name: 'HIDRO', dashStyle: 'Solid', realName: 'Hidroeléctrica', color: '#3188e5' },
     { name: 'SOLAR', dashStyle: 'Solid', realName: 'Solar', color:'#fab610' },
     { name: 'EOL', dashStyle: 'Solid', realName: 'Eólica', color: '#2aacc1' },
-    { name: 'BAGAZO', dashStyle: 'Solid', realName: 'BAGAZO', color: '#641111' },
+    { name: 'BAGAZO', dashStyle: 'Solid', realName: 'Bagazo', color: '#641111' },
   ];
 
   constructor(private http: HttpClient, private zone: NgZone) {}
