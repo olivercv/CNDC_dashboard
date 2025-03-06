@@ -137,7 +137,7 @@
 
 
 
-  <<g data-px-label="boxBack" transform="translate(0.331, 0.6481)">
+  <g data-px-label="boxBack" transform="translate(0.331, 0.6481)">
     <g>
       <path fill="#f6f6f6" d="M389.25,48.75L707.921,48.75L707.921,206.169L389.25,206.169L389.25,48.75zM389.25,48.75"/>
     </g>
@@ -178,12 +178,19 @@
     <circle id="btn-yellow" cx="414.695312" cy="150" r="5" class="btn" fill="#ffde59" />
     <circle id="btn-purple" cx="414.695312" cy="168" r="5" class="btn" fill="#c634eb" />
 
-  <text x="630" y="100" font-family="Arial" font-size="12" font-weight="500"  ><tspan>650.88 Mw</tspan></text>
-  <text x="630" y="118" font-family="Arial" font-size="12" font-weight="500"  ><tspan>456.1 Mw</tspan></text>
-  <text x="630" y="136" font-family="Arial" font-size="12" font-weight="500"  ><tspan>150 Mw</tspan></text>
-  <text x="630" y="154" font-family="Arial" font-size="12" font-weight="500"  ><tspan>19.43 Mw</tspan></text>
-  <text x="630" y="172" font-family="Arial" font-size="12" font-weight="500"  ><tspan>0 Mw</tspan></text>
-  <text x="630" y="190" font-family="Arial" font-size="12" font-weight="500"  ><tspan>1,120.5 Mw</tspan></text>
+  <g id="textos-dinamicos">
+    <ng-container  *ngFor="let item of processedDataOrdenada">
+      <text 
+        x="630" 
+        [attr.y]="posiciones[item.codigo]" 
+        font-family="Arial" 
+        font-size="12" 
+        font-weight="500"
+        style="dominant-baseline: middle;">
+        <tspan>{{ item.valor | number:'1.2-2' }} Mw</tspan>
+      </text>
+    </ng-container >
+  </g>
 
 
   <circle cx="286.14" cy="466.23" r="3" fill="#000000" fill-opacity="1" />

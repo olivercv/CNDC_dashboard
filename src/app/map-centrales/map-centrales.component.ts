@@ -1,14 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-
+type CodigosValidos = 'HIDRO' | 'TERMO' | 'EOL' | 'SOLAR' | 'BAGAZO' | 'TOT';
 @Component({
   selector: 'app-map-centrales',
+  standalone: true,
+  imports: [CommonModule], 
   templateUrl: './map-centrales.component.html',
   styleUrls: ['./map-centrales.component.css']
 })
-export class MapCentralesComponent implements OnInit {
+export class MapCentralesComponent implements OnInit, OnDestroy {
 
   circleData: any[] = []; // Datos vacíos inicialmente
+  private intervalId: any;
   buttons = [
     { id: "btn-red", colorClass: "red" },
     { id: "btn-blue", colorClass: "blue" },
@@ -16,14 +20,123 @@ export class MapCentralesComponent implements OnInit {
     { id: "btn-green", colorClass: "green" },
     { id: "btn-purple", colorClass: "purple" },
   ];
+  
+  
+  readonly ordenCodigos: CodigosValidos[] = [
+    'HIDRO',
+    'TERMO', 
+    'EOL',
+    'SOLAR',
+    'BAGAZO',
+    'TOT'
+  ];
 
-  constructor(private http: HttpClient) { }
+  posiciones: { [key in CodigosValidos]: number } = {
+    HIDRO: 100,
+    TERMO: 118,
+    EOL: 136,
+    SOLAR: 154,
+    BAGAZO: 172,
+    TOT: 190
+  };
+
+
+  constructor(private http: HttpClient, private zone: NgZone) { }
 
   ngOnInit(): void {
     this.fetchData();
+    this.startAutoRefresh();
   }
 
+  ngOnDestroy() {
+    this.stopAutoRefresh();
+  }
+
+  startAutoRefresh() {
+    this.zone.runOutsideAngular(() => {
+      this.intervalId = setInterval(() => this.fetchData(), 15000);
+    });
+  }
+
+  stopAutoRefresh() {
+    if (this.intervalId) clearInterval(this.intervalId);
+  }
+
+  get processedDataOrdenada(): { codigo: CodigosValidos; valor: number }[] {
+    return this.ordenCodigos
+      .map(codigo => this.processedData.find(d => d.codigo === codigo))
+      .filter((item): item is { codigo: CodigosValidos; valor: number } => !!item);
+  }
+
+  get datosOrdenados() {
+    return this.ordenCodigos
+      .map(codigo => this.processedData.find(d => d.codigo === codigo))
+      .filter(item => item) as { codigo: CodigosValidos; valor: number }[];
+  }
+
+  private obtenerUltimoValorPositivo(valores: number[]): number {
+    const valoresValidos = valores.filter(v => v > 0);
+    return valoresValidos.length > 0 ? valoresValidos.slice(-1)[0] : 0;
+  }
+
+  // En tu componente
+processedData: {codigo: CodigosValidos, valor: number}[] = []; 
+
+private procesarDatos(data: any[]) {
+  this.processedData = data
+    .filter(item => this.ordenCodigos.includes(item.codigo))
+    .map(item => ({
+      codigo: item.codigo as CodigosValidos,
+      valor: this.obtenerUltimoValorPositivo(item.valores)
+    }));
+}
+
+
+// generarElementosDinamicos() {
+//   const svg = document.querySelector('svg');
+  
+//   this.processedData.forEach((item, index) => {
+//     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+//     text.setAttribute('x', '630');
+//     text.setAttribute('y', `${100 + (index * 18)}`);
+//     text.setAttribute('font-family', 'Arial');
+//     text.setAttribute('font-size', '12');
+//     text.setAttribute('font-weight', '500');
+    
+//     const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+//     tspan.textContent = `${item.valor.toLocaleString('en-US', {maximumFractionDigits: 2})} Mw`;
+    
+//     text.appendChild(tspan);
+//     svg?.appendChild(text);
+//   });
+// }
+
   fetchData() {
+
+    const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
+    const dataApiUrl = 'https://cndcapi.cndc.bo/WebApi?code=0&Fecha=';
+
+    this.http.get<any[]>(fechaApiUrl).subscribe({
+      next: (fechas) => {
+        const fechaTiempoReal = fechas.find(f => f.tipo === 'TIEMPO_REAL')?.fecha;
+        if (!fechaTiempoReal) return;
+
+        this.http.get<any[]>(dataApiUrl + fechaTiempoReal).subscribe({
+          next: (data) => {
+            this.processedData = data
+              .filter(item => this.ordenCodigos.includes(item.codigo))
+              .map(item => ({
+                codigo: item.codigo as CodigosValidos,
+                valor: this.obtenerUltimoValorPositivo(item.valores)
+              }));
+          }
+        });
+      }  
+    });
+        
+
+
+
     this.http.get<any[]>('https://190.181.35.6:5000/WebApiGeneradores')
       .subscribe({
         next: (data) => {

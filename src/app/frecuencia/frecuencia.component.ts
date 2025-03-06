@@ -42,7 +42,7 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.maxSeconds; i++) {
       this.dataPoints.push([
         now - (this.maxSeconds - i) * 1000,
-        Number((Math.random() * (50.8 - 49.7) + 49.7).toFixed(2))
+        Number((Math.random() * (50.4 - 49.98) + 49.98).toFixed(2))
       ]);
     }
   }
@@ -52,7 +52,7 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   }
 
   private getLiveDataPoint(): number[] {
-    return [Date.now(), Number((Math.random() * (50.8 - 49.7) + 49.7).toFixed(2))];
+    return [Date.now(), Number((Math.random() * (50.4 - 49.98) + 49.98).toFixed(2))];
   }
 
   private updateChartData() {
@@ -93,8 +93,8 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
       },
       yAxis: {
         title: { text: 'Hz' },
-        min: 49.5,
-        max: 50.9,
+        min: 49.75,
+        max: 50.50,
         plotLines: this.getReferenceLines()
       },
       series: [{
@@ -117,17 +117,17 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   private getReferenceLines(): Highcharts.AxisPlotLinesOptions[] {
     return [
     {
-      value: 50,
+      value: 50.25,
       color: '#2C6CBF',
       width: 2,
       dashStyle: 'Dot',
-      label: { text: '50 Hz' }
+      label: { text: '50.25 Hz' }
     }, {
-      value: 50.7,
+      value: 50.50,
       color: '#D92211',
       width: 2,
       dashStyle: 'Dot',
-      label: { text: '50.7 Hz' }
+      label: { text: '50.50 Hz' }
     },
     {
       value: 49.75,
