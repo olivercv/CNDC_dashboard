@@ -44,6 +44,7 @@ export class MapCentralesComponent implements OnInit, OnDestroy {
   constructor(private http: HttpClient, private zone: NgZone) { }
 
   ngOnInit(): void {
+    this.fetchGenerators();
     this.fetchData();
     this.startAutoRefresh();
   }
@@ -91,25 +92,20 @@ private procesarDatos(data: any[]) {
     }));
 }
 
+  fetchGenerators() {
+    this.http.get<any[]>('https://190.181.35.6:5000/WebApiGeneradores')
+      .subscribe({
+        next: (data) => {
+          this.circleData = data;
+          this.createCircles();
+          this.setupEventListeners();
+        },
+        error: (error) => {
+          console.error('Error fetching data:', error);
+        }
+      });
 
-// generarElementosDinamicos() {
-//   const svg = document.querySelector('svg');
-  
-//   this.processedData.forEach((item, index) => {
-//     const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-//     text.setAttribute('x', '630');
-//     text.setAttribute('y', `${100 + (index * 18)}`);
-//     text.setAttribute('font-family', 'Arial');
-//     text.setAttribute('font-size', '12');
-//     text.setAttribute('font-weight', '500');
-    
-//     const tspan = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
-//     tspan.textContent = `${item.valor.toLocaleString('en-US', {maximumFractionDigits: 2})} Mw`;
-    
-//     text.appendChild(tspan);
-//     svg?.appendChild(text);
-//   });
-// }
+  }
 
   fetchData() {
 
@@ -134,20 +130,6 @@ private procesarDatos(data: any[]) {
       }  
     });
         
-
-
-
-    this.http.get<any[]>('https://190.181.35.6:5000/WebApiGeneradores')
-      .subscribe({
-        next: (data) => {
-          this.circleData = data;
-          this.createCircles();
-          this.setupEventListeners();
-        },
-        error: (error) => {
-          console.error('Error fetching data:', error);
-        }
-      });
   }
 
   createCircles(): void {
