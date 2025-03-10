@@ -101,7 +101,7 @@ private procesarDatos(data: any[]) {
           this.setupEventListeners();
         },
         error: (error) => {
-          console.error('Error fetching data:', error);
+          console.error('Error fetching Generators:', error);
         }
       });
 
