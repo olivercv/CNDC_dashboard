@@ -92,8 +92,8 @@ export class MapTransferenciasComponent implements OnInit {
     if (!svg) return;
 
     // this.clearExistingElements(svg);
-    this.createDynamicElements(svg);
     this.createStaticCircles(svg);
+    this.createDynamicElements(svg);
   }
 
   private clearExistingElements(svg: HTMLElement): void {
@@ -134,39 +134,48 @@ export class MapTransferenciasComponent implements OnInit {
     lineElement.setAttribute('stroke-width', '5');
     lineElement.setAttribute('data-info', line.info);
 
+    // Crear la punta de la flecha
+    const arrowHead = this.createArrowHead(svg, line);
+
+    // Agregar eventos hover para cambiar el color de la línea y la cabeza de la flecha
+    lineElement.addEventListener('mouseenter', () => {
+        lineElement.setAttribute('stroke', 'orange'); // Cambiar color de la línea
+        arrowHead.setAttribute('fill', 'orange'); // Cambiar color de la cabeza de la flecha
+    });
+
+    lineElement.addEventListener('mouseleave', () => {
+        lineElement.setAttribute('stroke', 'gray'); // Restaurar color de la línea
+        arrowHead.setAttribute('fill', 'grey'); // Restaurar color de la cabeza de la flecha
+    });
+
     lineElement.addEventListener('mouseover', (e) => this.showTooltip(e, line.info));
     lineElement.addEventListener('mousemove', (e) => this.moveTooltip(e));
     lineElement.addEventListener('mouseout', () => this.hideTooltip());
 
     svg.appendChild(lineElement);
-
-    // Crear la punta de la flecha
-    this.createArrowHead(svg, line);
 }
 
-private createArrowHead(svg: HTMLElement, line: LineData): void {
-  const arrowHead = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+private createArrowHead(svg: HTMLElement, line: LineData): SVGPolygonElement {
+    const arrowHead = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
 
-  // Definir los puntos del triángulo (punta de flecha) centrado
-  const arrowPoints = "0,-6.666 -5,3.333 5,3.333"; // Triángulo centrado
-  arrowHead.setAttribute('points', arrowPoints);
+    // Definir los puntos del triángulo (punta de flecha) centrado
+    const arrowPoints = "0,-6.666 -5,3.333 5,3.333"; // Triángulo centrado
+    arrowHead.setAttribute('points', arrowPoints);
 
-  // Calcular la posición y el ángulo de la punta de la flecha
-  const angle = this.calculateLineAngle(line); // Ángulo de la línea
-  const position = line.animation.invert ? line.start : line.end; // Posición de la punta
+    // Calcular la posición y el ángulo de la punta de la flecha
+    const angle = this.calculateLineAngle(line); // Ángulo de la línea
+    const position = line.animation.invert ? line.start : line.end; // Posición de la punta
 
-  // Depuración: Verificar posición y ángulo
-  console.log('Posición de la punta:', position);
-  console.log('Ángulo de la punta:', angle);
+    // Aplicar transformación para posicionar y rotar la punta de la flecha
+    arrowHead.setAttribute(
+        'transform',
+        `translate(${position.x},${position.y}) rotate(${angle})`
+    );
+    arrowHead.setAttribute('fill', 'grey'); // Color de la punta de la flecha
 
-  // Aplicar transformación para posicionar y rotar la punta de la flecha
-  arrowHead.setAttribute(
-      'transform',
-      `translate(${position.x},${position.y}) rotate(${angle})`
-  );
-  arrowHead.setAttribute('fill', 'grey'); // Color de la punta de la flecha
+    svg.appendChild(arrowHead);
 
-  svg.appendChild(arrowHead);
+    return arrowHead; // Devolver la cabeza de la flecha para usarla en los eventos hover
 }
 
 private calculateLineAngle(line: LineData): number {
