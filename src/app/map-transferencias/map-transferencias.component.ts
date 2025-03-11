@@ -148,7 +148,7 @@ export class MapTransferenciasComponent implements OnInit {
         arrowHead.setAttribute('fill', 'grey'); // Restaurar color de la cabeza de la flecha
     });
 
-    lineElement.addEventListener('mouseover', (e) => this.showTooltip(e, line.info));
+    lineElement.addEventListener('mouseover', (e) => this.showTooltip(e, line.inject));
     lineElement.addEventListener('mousemove', (e) => this.moveTooltip(e));
     lineElement.addEventListener('mouseout', () => this.hideTooltip());
 
