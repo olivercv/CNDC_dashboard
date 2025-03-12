@@ -8,6 +8,8 @@ interface LineData {
   start: { x: number; y: number };
   end: { x: number; y: number };
   inject: string;
+  flujo_activo: String;
+  flujo_reactivo: String;
   info: string;
   animation: {
     duration: string;
@@ -77,6 +79,8 @@ export class MapTransferenciasComponent implements OnInit {
       id: item.id,
       start: item.start,
       end: item.end,
+      flujo_activo: item.flujo_activo,
+      flujo_reactivo: item.flujo_reactivo,
       inject: item.inject,
       info: item.info,
       animation: {
@@ -148,7 +152,7 @@ export class MapTransferenciasComponent implements OnInit {
         arrowHead.setAttribute('fill', 'grey'); // Restaurar color de la cabeza de la flecha
     });
 
-    lineElement.addEventListener('mouseover', (e) => this.showTooltip(e, line.inject));
+    lineElement.addEventListener('mouseover', (e) => this.showTooltip(e, line.inject, line.info, line.flujo_activo, line.flujo_reactivo));
     lineElement.addEventListener('mousemove', (e) => this.moveTooltip(e));
     lineElement.addEventListener('mouseout', () => this.hideTooltip());
 
@@ -262,10 +266,10 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
   circle.appendChild(animateY);
 }
 
-  private showTooltip(event: MouseEvent, text: string): void {
+  private showTooltip(event: MouseEvent, text: String, info: String, activo: String, reactivo: String): void {
     const tooltip = document.getElementById('tooltip');
     if (tooltip) {
-      tooltip.innerHTML = `<b>${text}</b>`;
+      tooltip.innerHTML = `<b>${info}</b><p><b>Transferencia:</b>${text}</p><p><b>Potencia Activa: </b>${activo}</p><p><b>Potencia Reactiva: </b>${reactivo}</p>`;
       tooltip.style.opacity = '1';
       tooltip.style.left = `${event.pageX + 10}px`;
       tooltip.style.top = `${event.pageY + 10}px`;
@@ -308,29 +312,159 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
   private loadFallbackData(): void {
     this.data.lines = [
       {
-        id: "cb-lp",
-        start: { x: 169, y: 387 },
-        end: { x: 283, y: 464.5 },
-        inject: "355.020 Kwh",
-        info: "Línea Cochabamba - La Paz",
-        animation: {
-          duration: "2s",
-          invert: false,
-          begin: ["0s", "0.2s", "0.4s"]
+        "id": "cb-lp",
+        "start": {"x": 169, "y": 387},
+        "end": {"x": 283, "y": 464.5},
+        "inject": "355.020 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea Cochabamba - La Paz",
+        "animation": {
+            "duration": "2s",
+            "invert": true,
+            "begin": ["0s", "0.2s", "0.4s"]
         }
-      },
-      {
-        id: "lp-or",
-        start: { x: 167, y: 390 },
-        end: { x: 226.5, y: 497.5 },
-        inject: "55.520 Kwh",
-        info: "Línea La Paz - Oruro",
-        animation: {
-          duration: "2s",
-          invert: true,
-          begin: ["0s", "0.2s", "0.4s"]
+    },
+    {
+        "id": "lp-or",
+        "start": {"x": 167, "y": 390},
+        "end": {"x": 226.5, "y": 497.5},
+        "inject": "55.520 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea La Paz - Oruro",
+        "animation": {
+            "duration": "2s",
+            "invert": true,
+            "begin": ["0s", "0.2s", "0.4s"]
         }
-      }
+    },
+    {
+        "id": "lp-tr",
+        "start": {"x": 167, "y": 386},
+        "end": {"x": 333.5, "y": 293.5},
+        "inject": "20.200 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea La Paz - Trinidad",
+        "animation": {
+            "duration": "2s",
+            "invert": true,
+            "begin": ["0s", "0.2s", "0.4s"]
+        }
+    },
+    {
+        "id": "cb-sc",
+        "start": {"x": 288, "y": 467},
+        "end": {"x": 474, "y": 515},
+        "inject": "425.010 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea Cochabamba - Santa Cruz",
+        "animation": {
+            "duration": "2s",
+            "invert": false,
+            "begin": ["0s", "0.2s", "0.4s"]
+        }
+    },
+    {
+        "id": "cb-or",
+        "start": {"x": 287, "y": 467},
+        "end": {"x": 227, "y": 497},
+        "inject": "165.080 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea Cochabamba - Oruro",
+        "animation": {
+            "duration": "1s",
+            "invert": false,
+            "begin": ["0s", "0.2s", "0.4s"]
+        }
+    },
+    {
+        "id": "cb-pt",
+        "start": {"x": 287, "y": 467},
+        "end": {"x": 293, "y": 582},
+        "inject": "135.010 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea Cochabamba - Potosí",
+        "animation": {
+            "duration": "2s",
+            "invert": false,
+            "begin": ["0s", "0.2s", "0.4s"]
+        }
+    },
+    {
+        "id": "cb-ch",
+        "start": {"x": 287, "y": 467},
+        "end": {"x": 355, "y": 558},
+        "inject": "105.090 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea Cochabamba - Sucre",
+        "animation": {
+            "duration": "2s",
+            "invert": false,
+            "begin": ["0s", "0.2s", "0.4s"]
+        }
+    },
+    {
+        "id": "or-pt",
+        "start": {"x": 227, "y": 497},
+        "end": {"x": 293, "y": 582},
+        "inject": "35.500 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea Oruro - Potosí",
+        "animation": {
+            "duration": "2s",
+            "invert": false,
+            "begin": ["0s", "0.2s", "0.4s"]
+        }
+    },
+    {
+        "id": "pt-ch",
+        "start": {"x": 293, "y": 582},
+        "end": {"x": 355, "y": 558},
+        "inject": "25.420 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea Potosí - Sucre",
+        "animation": {
+            "duration": "1s",
+            "invert": false,
+            "begin": ["0s", "0.2s", "0.4s"]
+        }
+    },
+    {
+        "id": "pt-ta",
+        "start": {"x": 293, "y": 582},
+        "end": {"x": 363, "y": 682.5},
+        "inject": "135.300 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea Potosí - Tarija",
+        "animation": {
+            "duration": "2s",
+            "invert": false,
+            "begin": ["0s", "0.2s", "0.4s"]
+        }
+    },
+    {
+        "id": "sc-tr",
+        "start": {"x": 476.5, "y": 515},
+        "end": {"x": 333.5, "y": 293.5},
+        "inject": "355.020 Kw/h",
+        "flujo_activo": "23.000 MW",
+        "flujo_reactivo": "7.000 Mvar",
+        "info": "Línea Santa Cruz - Trinidad",
+        "animation": {
+            "duration": "2s",
+            "invert": true,
+            "begin": ["0s", "0.2s", "0.4s"]
+        }
+    }
     ];
     this.cdr.detectChanges();
     setTimeout(() => this.initMap(), 100);
