@@ -34,7 +34,8 @@
               "highcharts",
               "highcharts/highcharts-3d",
               "highcharts/highcharts-more"
-            ]
+            ],
+            "baseHref": "/"
 
           },
           "configurations": {
