@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { LiveDataService } from '../live-data.service';
 
 type RegionKey = 'norte' | 'este' | 'sur';
 
@@ -24,6 +25,10 @@ interface LineData {
   styleUrls: ['./map-transferencias.component.css']
 })
 export class MapTransferenciasComponent implements OnInit {
+  
+  frequency: string = '0.52 MHz';
+  dateTime: string = '18 de Marzo, 2025 10:19:15';
+  
   data: { lines: LineData[] } = {
     lines: []
   };
@@ -48,14 +53,20 @@ export class MapTransferenciasComponent implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private liveDataService: LiveDataService
   ) { }
 
   ngOnInit(): void {
-    this.fetchData();
-    // this.loadFallbackData();
+    this.liveDataService.getLiveData().subscribe(data => {
+      this.frequency = `${data.frequency.toString()} MHz`;
+      this.dateTime = data.dateTime;
+    });
+    // this.fetchData();
+    this.loadFallbackData();
   }
 
+  
   private fetchData(): void {
     this.http.get<any[]>('https://190.181.35.6:5000/WebApiRTransferencias').subscribe({
       next: (apiResponse) => {
@@ -313,7 +324,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     this.data.lines = [
       {
         "id": "cb-lp",
-        "start": {"x": 169, "y": 387},
+        "start": {"x": 174, "y": 405},
         "end": {"x": 283, "y": 464.5},
         "inject": "355.020 Kw/h",
         "flujo_activo": "23.000 MW",
@@ -327,7 +338,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     },
     {
         "id": "lp-or",
-        "start": {"x": 167, "y": 390},
+        "start": {"x": 170, "y": 412},
         "end": {"x": 226.5, "y": 497.5},
         "inject": "55.520 Kw/h",
         "flujo_activo": "23.000 MW",
@@ -341,7 +352,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     },
     {
         "id": "lp-tr",
-        "start": {"x": 167, "y": 386},
+        "start": {"x": 170, "y": 398},
         "end": {"x": 333.5, "y": 293.5},
         "inject": "20.200 Kw/h",
         "flujo_activo": "23.000 MW",
@@ -356,7 +367,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     {
         "id": "cb-sc",
         "start": {"x": 288, "y": 467},
-        "end": {"x": 474, "y": 515},
+        "end": {"x": 460, "y": 485},
         "inject": "425.010 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
@@ -453,7 +464,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     },
     {
         "id": "sc-tr",
-        "start": {"x": 476.5, "y": 515},
+        "start": {"x": 460, "y": 485},
         "end": {"x": 333.5, "y": 293.5},
         "inject": "355.020 Kw/h",
         "flujo_activo": "23.000 MW",

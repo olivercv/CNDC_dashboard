@@ -1,13 +1,8 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-// Importar módulos necesarios
-// import HighchartsMore from 'highcharts/highcharts-more';
-// import HighchartsExporting from 'highcharts/modules/exporting';
-
-// // Inicializar módulos
-// if (typeof HighchartsExporting === 'function') {  HighchartsExporting(Highcharts); }
-// if (typeof HighchartsMore === 'function') { HighchartsMore(Highcharts); } 
+import { LiveDataService } from '../live-data.service'; // Asegúrate de importar el servicio
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-frecuencia',
@@ -19,21 +14,21 @@ import { HighchartsChartModule } from 'highcharts-angular';
 export class FrecuenciaComponent implements OnInit, OnDestroy {
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions!: Highcharts.Options;
-  private intervalId: any;
   private dataPoints: number[][] = [];
   private readonly maxSeconds = 50;
+  private liveDataSubscription!: Subscription;
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(private cdr: ChangeDetectorRef, private liveDataService: LiveDataService) {
     this.initializeHistoricalData();
   }
 
   ngOnInit() {
     this.initializeChart();
-    this.startAutoRefresh();
+    this.subscribeToLiveData();
   }
 
   ngOnDestroy() {
-    this.stopAutoRefresh();
+    this.unsubscribeFromLiveData();
   }
 
   private initializeHistoricalData() {
@@ -42,7 +37,7 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
     for (let i = 0; i < this.maxSeconds; i++) {
       this.dataPoints.push([
         now - (this.maxSeconds - i) * 1000,
-        Number((Math.random() * (50.25 - 49.75) + 49.75).toFixed(2))
+        Number((Math.random() * (50.05 - 49.95) + 49.95).toFixed(2))
       ]);
     }
   }
@@ -51,12 +46,22 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
     this.chartOptions = this.buildChartOptions();
   }
 
-  private getLiveDataPoint(): number[] {
-    return [Date.now(), Number((Math.random() * (50.25 - 49.75) + 49.75).toFixed(2))];
+  private subscribeToLiveData() {
+    this.liveDataSubscription = this.liveDataService.getLiveData().subscribe(data => {
+      this.updateChartData(data.frequency);
+      this.chartOptions = this.buildChartOptions();
+      this.cdr.detectChanges();
+    });
   }
 
-  private updateChartData() {
-    const newPoint = this.getLiveDataPoint();
+  private unsubscribeFromLiveData() {
+    if (this.liveDataSubscription) {
+      this.liveDataSubscription.unsubscribe();
+    }
+  }
+
+  private updateChartData(frequency: number) {
+    const newPoint = [Date.now(), frequency];
     
     // Mantener histórico + nuevo punto
     this.dataPoints = [
@@ -116,42 +121,30 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
 
   private getReferenceLines(): Highcharts.AxisPlotLinesOptions[] {
     return [
-    {
-      value: 50,
-      color: '#2C6CBF',
-      width: 3,
-      dashStyle: 'Dot',
-      label: { text: '' }
-    }, {
-      value: 50.25,
-      color: '#D92211',
-      width: 2,
-      dashStyle: 'Dot',
-      label: { text: '50.25 Hz' }
-    },
-    {
-      value: 49.75,
-      color: '#D92211',
-      width: 2,
-      dashStyle: 'Dot',
-      label: { text: '49.75 Hz' }
-    }
-  ];
+      {
+        value: 50,
+        color: '#2C6CBF',
+        width: 3,
+        dashStyle: 'Dot',
+        label: { text: '' }
+      }, {
+        value: 50.25,
+        color: '#D92211',
+        width: 2,
+        dashStyle: 'Dot',
+        label: { text: '50.25 Hz' }
+      },
+      {
+        value: 49.75,
+        color: '#D92211',
+        width: 2,
+        dashStyle: 'Dot',
+        label: { text: '49.75 Hz' }
+      }
+    ];
   }
 
   private handleChartLoad() {
     setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
-  }
-
-  startAutoRefresh() {
-    this.intervalId = setInterval(() => {
-      this.updateChartData();
-      this.chartOptions = this.buildChartOptions();
-      this.cdr.detectChanges();
-    }, 1000);
-  }
-
-  stopAutoRefresh() {
-    if (this.intervalId) clearInterval(this.intervalId);
   }
 }
