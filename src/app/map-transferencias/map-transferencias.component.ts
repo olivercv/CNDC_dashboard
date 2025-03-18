@@ -36,14 +36,14 @@ export class MapTransferenciasComponent implements OnInit {
 
   private predefinedCircles = [
     { cx: 286, cy: 466.23, r: 4 },
-    { cx: 166.52, cy: 386.93, r: 4 },
+    { cx: 166.52, cy: 405, r: 4 },
     { cx: 333.50, cy: 293.60, r: 4 },
     { cx: 156.00, cy: 154.25, r: 4 },
     { cx: 226.82, cy: 497.38, r: 4 },
     { cx: 355.39, cy: 558.00, r: 4 },
     { cx: 293.37, cy: 582.23, r: 4 },
     { cx: 363.13, cy: 682.48, r: 4 },
-    { cx: 474.30, cy: 514.55, r: 4 }
+    { cx: 460.30, cy: 485.55, r: 4 }
   ];
 
   constructor(

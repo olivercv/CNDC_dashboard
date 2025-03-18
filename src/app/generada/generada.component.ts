@@ -89,7 +89,7 @@ export class GeneradaComponent implements OnInit, OnDestroy {
               xAxis: {
                 title: { text: 'Horas' },
                 type: 'datetime',
-                min: baseDate.getTime(),
+                min: baseDate.getTime() + 900000,
                 max: baseDate.getTime() + 86400000, // 24 horas
                 tickInterval: 3600000*3, // 3 horas
                 labels: { format: '{value:%H:%M}' },

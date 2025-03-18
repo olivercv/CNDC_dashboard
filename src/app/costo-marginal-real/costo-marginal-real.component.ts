@@ -38,9 +38,25 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
   }
 
   private formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return `${(date.getMonth() + 1).toString().padStart(2, '0')}.${date.getDate().toString().padStart(2, '0')}.${date.getFullYear()}`;
-  }
+    // Convertir "16.03.2025" a "2025-03-16"
+    const parts = dateString.split(".");
+    if (parts.length !== 3) {
+        console.error("Formato incorrecto:", dateString);
+        return "Fecha inválida";
+    }
+
+    const [day, month, year] = parts;
+    const formattedDate = `${year}-${month}-${day}`; // Formato compatible con Date
+
+    const date = new Date(formattedDate);
+    if (isNaN(date.getTime())) {
+        console.error("Fecha inválida:", dateString);
+        return "Fecha inválida";
+    }
+
+    return new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
+}
+
 
   fetchData() {
     const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
@@ -56,6 +72,7 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
         baseDate.setUTCHours(0, 0, 0, 0); // Fijar a medianoche en UTC
         
         const formattedDate = this.formatDate(postdespachoDate);
+        // console.log('FECHA ', formattedDate);
         const dataApiUrl = `https://cndcapi.cndc.bo/WebApi?code=${code}&Fecha=${formattedDate}`;
   
         this.http.get<any[]>(dataApiUrl).subscribe({
@@ -139,6 +156,7 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
           lineWidth: 2 // Grosor de línea consistente
         }
       },
+      credits: { enabled: false },
       colors: ['#058DC7'],
       series: seriesData
     };
