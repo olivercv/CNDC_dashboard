@@ -26,7 +26,7 @@ interface LineData {
 })
 export class MapTransferenciasComponent implements OnInit {
   
-  frequency: string = '0.52 MHz';
+  frequency: string = '0.52';
   dateTime: string = '18 de Marzo, 2025 10:19:15';
   
   data: { lines: LineData[] } = {
@@ -59,7 +59,7 @@ export class MapTransferenciasComponent implements OnInit {
 
   ngOnInit(): void {
     this.liveDataService.getLiveData().subscribe(data => {
-      this.frequency = `${data.frequency.toString()} MHz`;
+      this.frequency = `${data.frequency.toString()} `;
       this.dateTime = data.dateTime;
     });
     // this.fetchData();
