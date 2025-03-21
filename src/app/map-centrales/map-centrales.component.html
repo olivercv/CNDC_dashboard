@@ -181,11 +181,12 @@
   <g id="textos-dinamicos">
     <ng-container  *ngFor="let item of processedDataOrdenada">
       <text 
-        x="630" 
+        x="690" 
         [attr.y]="posiciones[item.codigo]" 
         font-family="Arial" 
         font-size="12" 
         font-weight="500"
+        text-anchor="end"
         style="dominant-baseline: middle;">
         <tspan>{{ item.valor | number:'1.2-2' }} MW</tspan>
       </text>

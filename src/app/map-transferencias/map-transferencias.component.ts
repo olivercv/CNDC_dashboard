@@ -26,8 +26,8 @@ interface LineData {
 })
 export class MapTransferenciasComponent implements OnInit {
   
-  frequency: string = '0.52';
-  dateTime: string = '18 de Marzo, 2025 10:19:15';
+  frequency: string = '0 Hz';
+  dateTime: string = '';
   
   data: { lines: LineData[] } = {
     lines: []
@@ -40,15 +40,15 @@ export class MapTransferenciasComponent implements OnInit {
   };
 
   private predefinedCircles = [
-    { cx: 286, cy: 466.23, r: 4 },
-    { cx: 166.52, cy: 405, r: 4 },
-    { cx: 333.50, cy: 293.60, r: 4 },
-    { cx: 156.00, cy: 154.25, r: 4 },
-    { cx: 226.82, cy: 497.38, r: 4 },
-    { cx: 355.39, cy: 558.00, r: 4 },
-    { cx: 293.37, cy: 582.23, r: 4 },
-    { cx: 363.13, cy: 682.48, r: 4 },
-    { cx: 460.30, cy: 485.55, r: 4 }
+    { cx: 287, cy: 466, r: 4 },
+    { cx: 166, cy: 405, r: 4 },
+    { cx: 333, cy: 293, r: 4 },
+    { cx: 156, cy: 154, r: 4 },
+    { cx: 226, cy: 497, r: 4 },
+    { cx: 355, cy: 558, r: 4 },
+    { cx: 293, cy: 582, r: 4 },
+    { cx: 363, cy: 682, r: 4 },
+    { cx: 460, cy: 485, r: 4 }
   ];
 
   constructor(
@@ -59,7 +59,7 @@ export class MapTransferenciasComponent implements OnInit {
 
   ngOnInit(): void {
     this.liveDataService.getLiveData().subscribe(data => {
-      this.frequency = `${data.frequency.toString()} `;
+      this.frequency = `${data.frequency.toString()} Hz`;
       this.dateTime = data.dateTime;
     });
     // this.fetchData();
@@ -111,12 +111,6 @@ export class MapTransferenciasComponent implements OnInit {
     this.createDynamicElements(svg);
   }
 
-  private clearExistingElements(svg: HTMLElement): void {
-    ['line', 'g', 'polygon'].forEach(tag => {
-      const elements = svg.getElementsByTagName(tag);
-      // while (elements.length > 0) elements[0].remove();
-    });
-  }
 
   private createStaticCircles(svg: HTMLElement): void {
     this.predefinedCircles.forEach(circle => {
@@ -137,87 +131,133 @@ export class MapTransferenciasComponent implements OnInit {
   }
 
   private createLine(svg: HTMLElement, line: LineData): void {
-    // Crear la línea
+    // Calcular la dirección de la línea
+    const dx = line.end.x - line.start.x;
+    const dy = line.end.y - line.start.y;
+    const length = Math.sqrt(dx * dx + dy * dy);
+
+    // Calcular el vector unitario en la dirección de la línea
+    const ux = dx / length;
+    const uy = dy / length;
+
+    // Ajustar los puntos de inicio y final para reducir la longitud
+    const offset = 5;
+    const { newStartX, newStartY, newEndX, newEndY } = this.calculateAdjustedPoints(line, ux, uy, offset);
+
+    // Crear la línea con los nuevos puntos
+    const lineElement = this.createLineElement(line, newStartX, newStartY, newEndX, newEndY);
+
+    // Crear la punta de la flecha en el nuevo final de la línea
+    const arrowHead = this.createArrowHead(svg, line, newStartX, newStartY, newEndX, newEndY);
+
+    // Agregar eventos hover para cambiar el color de la línea y la cabeza de la flecha
+    this.addLineHoverEffects(lineElement, arrowHead, line);
+
+    svg.appendChild(lineElement);
+}
+
+private calculateAdjustedPoints(line: LineData, ux: number, uy: number, offset: number): {
+    newStartX: number;
+    newStartY: number;
+    newEndX: number;
+    newEndY: number;
+} {
+    let newStartX, newStartY, newEndX, newEndY;
+
+    if (line.animation.invert) {
+        newStartX = line.start.x + ux * offset * 2;
+        newStartY = line.start.y + uy * offset * 2;
+        newEndX = line.end.x - ux * offset;
+        newEndY = line.end.y - uy * offset;
+    } else {
+        newStartX = line.start.x + ux * offset;
+        newStartY = line.start.y + uy * offset;
+        newEndX = line.end.x - ux * offset * 2;
+        newEndY = line.end.y - uy * offset * 2;
+    }
+
+    return { newStartX, newStartY, newEndX, newEndY };
+}
+
+private createLineElement(line: LineData, newStartX: number, newStartY: number, newEndX: number, newEndY: number): SVGLineElement {
     const lineElement = document.createElementNS("http://www.w3.org/2000/svg", "line");
     lineElement.setAttribute('id', line.id);
-    lineElement.setAttribute('x1', line.start.x.toString());
-    lineElement.setAttribute('y1', line.start.y.toString());
-    lineElement.setAttribute('x2', line.end.x.toString());
-    lineElement.setAttribute('y2', line.end.y.toString());
+    lineElement.setAttribute('x1', newStartX.toString());
+    lineElement.setAttribute('y1', newStartY.toString());
+    lineElement.setAttribute('x2', newEndX.toString());
+    lineElement.setAttribute('y2', newEndY.toString());
     lineElement.setAttribute('class', 'line');
     lineElement.setAttribute('stroke', 'gray');
     lineElement.setAttribute('stroke-width', '5');
     lineElement.setAttribute('data-info', line.info);
 
-    // Crear la punta de la flecha
-    const arrowHead = this.createArrowHead(svg, line);
-
-    // Agregar eventos hover para cambiar el color de la línea y la cabeza de la flecha
-    lineElement.addEventListener('mouseenter', () => {
-        lineElement.setAttribute('stroke', 'orange'); // Cambiar color de la línea
-        arrowHead.setAttribute('fill', 'orange'); // Cambiar color de la cabeza de la flecha
-    });
-
-    lineElement.addEventListener('mouseleave', () => {
-        lineElement.setAttribute('stroke', 'gray'); // Restaurar color de la línea
-        arrowHead.setAttribute('fill', 'grey'); // Restaurar color de la cabeza de la flecha
-    });
-
-    lineElement.addEventListener('mouseover', (e) => this.showTooltip(e, line.inject, line.info, line.flujo_activo, line.flujo_reactivo));
-    lineElement.addEventListener('mousemove', (e) => this.moveTooltip(e));
-    lineElement.addEventListener('mouseout', () => this.hideTooltip());
-
-    svg.appendChild(lineElement);
+    return lineElement;
 }
 
-private createArrowHead(svg: HTMLElement, line: LineData): SVGPolygonElement {
+private createArrowHead(svg: HTMLElement, line: LineData, newStartX: number, newStartY: number, newEndX: number, newEndY: number): SVGPolygonElement {
     const arrowHead = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
 
     // Definir los puntos del triángulo (punta de flecha) centrado
     const arrowPoints = "0,-6.666 -5,3.333 5,3.333"; // Triángulo centrado
     arrowHead.setAttribute('points', arrowPoints);
 
-    // Calcular la posición y el ángulo de la punta de la flecha
-    const angle = this.calculateLineAngle(line); // Ángulo de la línea
-    const position = line.animation.invert ? line.start : line.end; // Posición de la punta
+    // Calcular la dirección de la línea
+    const dx = line.end.x - line.start.x;
+    const dy = line.end.y - line.start.y;
+
+    // Calcular el ángulo de la línea
+    let angle = Math.atan2(dy, dx) * (180 / Math.PI); // Convertir a grados
+
+    // Si invert es true, rotar la flecha 180 grados para que apunte en sentido contrario
+    if (line.animation.invert) {
+        angle += 180; // Rotar 180 grados
+    }
+
+    // Ajustar la posición de la punta de la flecha
+    const arrowPositionX = line.animation.invert ? newStartX : newEndX;
+    const arrowPositionY = line.animation.invert ? newStartY : newEndY;
 
     // Aplicar transformación para posicionar y rotar la punta de la flecha
     arrowHead.setAttribute(
         'transform',
-        `translate(${position.x},${position.y}) rotate(${angle})`
+        `translate(${arrowPositionX},${arrowPositionY}) rotate(${angle + 90})` // Ajustar el ángulo para que apunte correctamente
     );
     arrowHead.setAttribute('fill', 'grey'); // Color de la punta de la flecha
 
     svg.appendChild(arrowHead);
 
-    return arrowHead; // Devolver la cabeza de la flecha para usarla en los eventos hover
+    return arrowHead;
 }
 
-private calculateLineAngle(line: LineData): number {
-  const dx = line.end.x - line.start.x;
-  const dy = line.end.y - line.start.y;
-  const angle = Math.atan2(dy, dx) * (180 / Math.PI); // Convertir a grados
+private addLineHoverEffects(lineElement: SVGLineElement, arrowHead: SVGPolygonElement, line: LineData): void {
+  lineElement.addEventListener('mouseenter', () => {
+      lineElement.setAttribute('stroke', 'orange'); // Cambiar color de la línea
+      arrowHead.setAttribute('fill', 'orange'); // Cambiar color de la cabeza de la flecha
+  });
 
-  // Ajustar el ángulo para que el triángulo apunte en la dirección correcta
-  const adjustedAngle = angle + 90;
+  lineElement.addEventListener('mouseleave', () => {
+      lineElement.setAttribute('stroke', 'gray'); // Restaurar color de la línea
+      arrowHead.setAttribute('fill', 'grey'); // Restaurar color de la cabeza de la flecha
+  });
 
-  // Ajustar el ángulo si la animación está invertida
-  return line.animation.invert ? adjustedAngle + 180 : adjustedAngle;
+  lineElement.addEventListener('mouseover', (e) => {
+      // Modificar el contenido de line.info si line.animation.invert es true
+      let info = line.info;
+      if (line.animation.invert) {
+          const parts = info.split(' - '); // Dividir el texto en partes
+          if (parts.length === 2) {
+              info = `${parts[1]} - ${parts[0]}`; // Invertir las partes
+          }
+      }
+
+      // Mostrar el tooltip con la información modificada
+      this.showTooltip(e, line.inject, info, line.flujo_activo, line.flujo_reactivo);
+  });
+
+  lineElement.addEventListener('mousemove', (e) => this.moveTooltip(e));
+  lineElement.addEventListener('mouseout', () => this.hideTooltip());
 }
 
-private calculateArrowPosition(line: LineData): { x: number; y: number } {
-  const offset = 10; // Ajusta este valor para mover la flecha más o menos
-  const dx = line.end.x - line.start.x;
-  const dy = line.end.y - line.start.y;
-  const length = Math.sqrt(dx * dx + dy * dy); // Longitud de la línea
-  const ratio = (length - offset) / length; // Proporción para mover la flecha
-
-  // Calcular la posición de la flecha
-  return {
-      x: line.start.x + dx * ratio,
-      y: line.start.y + dy * ratio
-  };
-}
 
 
   private createAnimatedCircles(svg: HTMLElement, line: LineData): void {
@@ -280,7 +320,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
   private showTooltip(event: MouseEvent, text: String, info: String, activo: String, reactivo: String): void {
     const tooltip = document.getElementById('tooltip');
     if (tooltip) {
-      tooltip.innerHTML = `<b>${info}</b><p><b>Transferencia:</b>${text}</p><p><b>Potencia Activa: </b>${activo}</p><p><b>Potencia Reactiva: </b>${reactivo}</p>`;
+      tooltip.innerHTML = `<b>Línea ${info}</b><p><b>Transferencia:</b>${text}</p><p><b>Potencia Activa: </b>${activo}</p><p><b>Potencia Reactiva: </b>${reactivo}</p>`;
       tooltip.style.opacity = '1';
       tooltip.style.left = `${event.pageX + 10}px`;
       tooltip.style.top = `${event.pageY + 10}px`;
@@ -320,16 +360,17 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     });
   }
 
+
   private loadFallbackData(): void {
     this.data.lines = [
       {
-        "id": "cb-lp",
-        "start": {"x": 174, "y": 405},
-        "end": {"x": 283, "y": 464.5},
+        "id": "lp-cb",
+        "start": {"x": 166, "y": 405},
+        "end": {"x": 286, "y": 466},
         "inject": "355.020 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea Cochabamba - La Paz",
+        "info": "La Paz - Cochabamba",
         "animation": {
             "duration": "2s",
             "invert": true,
@@ -338,12 +379,12 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     },
     {
         "id": "lp-or",
-        "start": {"x": 170, "y": 412},
-        "end": {"x": 226.5, "y": 497.5},
+        "start": {"x": 166, "y": 405},
+        "end": {"x": 226, "y": 497},
         "inject": "55.520 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea La Paz - Oruro",
+        "info": "La Paz - Oruro",
         "animation": {
             "duration": "2s",
             "invert": true,
@@ -352,12 +393,12 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     },
     {
         "id": "lp-tr",
-        "start": {"x": 170, "y": 398},
-        "end": {"x": 333.5, "y": 293.5},
+        "start": {"x": 166, "y": 405},
+        "end": {"x": 333, "y": 293},
         "inject": "20.200 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea La Paz - Trinidad",
+        "info": "La Paz - Trinidad",
         "animation": {
             "duration": "2s",
             "invert": true,
@@ -371,7 +412,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
         "inject": "425.010 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea Cochabamba - Santa Cruz",
+        "info": "Cochabamba - Santa Cruz",
         "animation": {
             "duration": "2s",
             "invert": false,
@@ -385,7 +426,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
         "inject": "165.080 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea Cochabamba - Oruro",
+        "info": "Cochabamba - Oruro",
         "animation": {
             "duration": "1s",
             "invert": false,
@@ -399,7 +440,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
         "inject": "135.010 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea Cochabamba - Potosí",
+        "info": "Cochabamba - Potosí",
         "animation": {
             "duration": "2s",
             "invert": false,
@@ -413,7 +454,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
         "inject": "105.090 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea Cochabamba - Sucre",
+        "info": "Cochabamba - Sucre",
         "animation": {
             "duration": "2s",
             "invert": false,
@@ -427,7 +468,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
         "inject": "35.500 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea Oruro - Potosí",
+        "info": "Oruro - Potosí",
         "animation": {
             "duration": "2s",
             "invert": false,
@@ -441,7 +482,7 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
         "inject": "25.420 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea Potosí - Sucre",
+        "info": "Potosí - Sucre",
         "animation": {
             "duration": "1s",
             "invert": false,
@@ -451,11 +492,11 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     {
         "id": "pt-ta",
         "start": {"x": 293, "y": 582},
-        "end": {"x": 363, "y": 682.5},
+        "end": {"x": 363, "y": 682},
         "inject": "135.300 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea Potosí - Tarija",
+        "info": "Potosí - Tarija",
         "animation": {
             "duration": "2s",
             "invert": false,
@@ -465,11 +506,11 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
     {
         "id": "sc-tr",
         "start": {"x": 460, "y": 485},
-        "end": {"x": 333.5, "y": 293.5},
+        "end": {"x": 333, "y": 293},
         "inject": "355.020 Kw/h",
         "flujo_activo": "23.000 MW",
         "flujo_reactivo": "7.000 Mvar",
-        "info": "Línea Santa Cruz - Trinidad",
+        "info": "Santa Cruz - Trinidad",
         "animation": {
             "duration": "2s",
             "invert": true,
