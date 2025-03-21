@@ -23,8 +23,8 @@ export class MapCentralesComponent implements OnInit, OnDestroy {
   
   
   readonly ordenCodigos: CodigosValidos[] = [
-    'HIDRO',
-    'TERMO', 
+    'TERMO',
+    'HIDRO', 
     'EOL',
     'SOLAR',
     'BAGAZO',
@@ -32,8 +32,8 @@ export class MapCentralesComponent implements OnInit, OnDestroy {
   ];
 
   posiciones: { [key in CodigosValidos]: number } = {
-    HIDRO: 100,
-    TERMO: 118,
+    TERMO: 100,
+    HIDRO: 118,
     EOL: 136,
     SOLAR: 154,
     BAGAZO: 172,
