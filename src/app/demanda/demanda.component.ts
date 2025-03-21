@@ -69,7 +69,7 @@ export class DemandaComponent implements OnInit, OnDestroy {
             let seriesData = data.map(item => ({
               name: item.codigo,
               data: item.valores.map((val: number, index: number) => {
-                const timestamp = baseDate.getTime() + (index * 900000); // 15 minutos en ms (15 * 60 * 1000)
+                const timestamp = baseDate.getTime() + (index * 900000) + 900000;  // 15 minutos en ms (15 * 60 * 1000)
                 return [timestamp, val === -1 ? null : val];
               }),
             }));
@@ -91,7 +91,7 @@ export class DemandaComponent implements OnInit, OnDestroy {
               xAxis: {
                 title: { text: 'Horas' },
                 type: 'datetime',
-                min: baseDate.getTime(),
+                min: baseDate.getTime()+ 900000,
                 max: baseDate.getTime() + 86400000, // 24 horas
                 tickInterval: 3600000*3, // 3 horas
                 labels: { format: '{value:%H:%M}' },

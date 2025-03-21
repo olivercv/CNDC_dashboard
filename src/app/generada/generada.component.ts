@@ -67,7 +67,8 @@ export class GeneradaComponent implements OnInit, OnDestroy {
             let seriesData = data.map(item => ({
               name: item.codigo,
               data: item.valores.map((val: number, index: number) => {
-                const timestamp = baseDate.getTime() + (index * 900000); // 15 minutos en ms (15 * 60 * 1000)
+                const timestamp = baseDate.getTime() + (index * 900000) + 900000; // Ajustar 15 minutos extra
+
                 return [timestamp, val === -1 ? null : val];
               }),
             }));
