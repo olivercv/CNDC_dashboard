@@ -37,6 +37,9 @@ opacity: 0.5; /* 50% de opacidad */
   transition: opacity 0.3s ease;
   border: 1.5px solid #999;
 }
+
+
+
 .circle {
 stroke: #FFF !important;
 stroke-width: 2 !important;

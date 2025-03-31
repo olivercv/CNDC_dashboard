@@ -16,3 +16,41 @@ body{
   cursor:pointer;
   }
   
+
+.tooltip-row {
+    display: flex;
+    justify-content: space-between;
+}
+
+.tooltip-row b {
+    width: 80px;
+    text-align: left;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.tooltip-row span {
+
+  width: 80px;
+  text-align: right;
+  /* background-color: blue; */
+  justify-content: space-between;
+  white-space: nowrap; /* Previene el salto de línea */
+  overflow: hidden; /* Oculta contenido adicional si excede el ancho */
+  text-overflow: ellipsis; /* Añade puntos suspensivos si es muy largo */
+}
+
+
+
+.tooltip-title {
+  display: flex;
+  justify-content: space-between;
+  padding: 1px 0; /* Espaciado entre líneas */
+}
+
+.tooltip-title b {
+  flex: 1;
+  text-align: left;
+  font-weight: bold;
+  width: 100%;
+}

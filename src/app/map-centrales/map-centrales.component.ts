@@ -159,46 +159,76 @@ private procesarDatos(data: any[]) {
     const tooltip = document.getElementById('tooltip');
   
     if (svg && tooltip) {
-      svg.addEventListener('mouseover', (event: Event) => {
-        const target = event.target as SVGElement;
-        if (target.tagName === 'circle') {
-          const info = target.getAttribute('data-info');
-          const potencia_activa = target.getAttribute('potencia_activa');
-          const potencia_reactiva = target.getAttribute('potencia_reactiva');
-          const capacidad_instalada = target.getAttribute('capacidad_instalada');
-          if (info) {
-            tooltip.innerHTML = `<b>${info}</b><br><b>Potencia activa: </b>${potencia_activa} <br>
-            <b>Potencia reactiva: </b> ${potencia_reactiva} <br> 
-            <b>Capacidad instalada: </b>${capacidad_instalada || ''}`;
-            tooltip.style.opacity = '1';
-          }
-        }
-      });
+        svg.addEventListener('mouseover', (event: Event) => {
+            const target = event.target as SVGElement;
+            if (target.tagName === 'circle') {
+                const info = target.getAttribute('data-info');
+                const potencia_activa = target.getAttribute('potencia_activa');
+                const potencia_reactiva = target.getAttribute('potencia_reactiva');
+                const capacidad_instalada = target.getAttribute('capacidad_instalada');
+                if (info) {
+                    tooltip.innerHTML = `
+                        <div class="tooltip-title">
+                            <b>${info}</b>
+                        </div>
+                        <div class="tooltip-row">
+                            <b>Potencia activa:</b><span>${potencia_activa}</span>
+                        </div>
+                        <div class="tooltip-row">
+                            <b>Potencia reactiva:</b><span>${potencia_reactiva}</span>
+                        </div>
+                        <div class="tooltip-row">
+                            <b>Capacidad instalada:</b><span>${capacidad_instalada || ''}</span>
+                        </div>
+                    `;
+                    tooltip.style.opacity = '1';
+                }
+            }
+        });
 
-      svg.addEventListener('mousemove', (event: Event) => {
-        const mouseEvent = event as MouseEvent;
-        tooltip.style.left = `${mouseEvent.pageX + 10}px`;
-        tooltip.style.top = `${mouseEvent.pageY + 10}px`;
-      });
+        svg.addEventListener('mousemove', (event: Event) => {
+            const mouseEvent = event as MouseEvent;
+            const tooltipWidth = tooltip.offsetWidth;
+            const tooltipHeight = tooltip.offsetHeight;
+            const pageWidth = window.innerWidth;
+            const pageHeight = window.innerHeight;
 
-      svg.addEventListener('mouseout', () => {
-        tooltip.style.opacity = '0';
-      });
+            let left = mouseEvent.pageX + 10; // Por defecto a la derecha del cursor
+            let top = mouseEvent.pageY + 10;  // Por defecto debajo del cursor
+
+            // Ajustar horizontalmente si se sale del viewport
+            if (left + tooltipWidth > pageWidth) {
+                left = pageWidth - tooltipWidth - 10; // Mueve el tooltip a la izquierda
+            }
+
+            // Ajustar verticalmente si se sale del viewport
+            if (top + tooltipHeight > pageHeight) {
+                top = pageHeight - tooltipHeight - 10; // Mueve el tooltip hacia arriba
+            }
+
+            tooltip.style.left = `${left}px`;
+            tooltip.style.top = `${top}px`;
+        });
+
+        svg.addEventListener('mouseout', () => {
+            tooltip.style.opacity = '0';
+        });
     }
 
     this.buttons.forEach(button => {
-      const btnElement = document.getElementById(button.id);
-      if (btnElement) {
-        btnElement.addEventListener('click', () => {
-          const circlesByColor = document.querySelectorAll(`.${button.colorClass}`);
-          circlesByColor.forEach(circle => {
-            circle.classList.toggle('hidden');
-          });
-          btnElement.classList.toggle('transparent-button');
-        });
-      }
+        const btnElement = document.getElementById(button.id);
+        if (btnElement) {
+            btnElement.addEventListener('click', () => {
+                const circlesByColor = document.querySelectorAll(`.${button.colorClass}`);
+                circlesByColor.forEach(circle => {
+                    circle.classList.toggle('hidden');
+                });
+                btnElement.classList.toggle('transparent-button');
+            });
+        }
     });
-  }
+}
+
 
   private loadFallbackData(): void {
     this.circleData = [

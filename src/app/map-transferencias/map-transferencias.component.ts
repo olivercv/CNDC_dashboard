@@ -317,15 +317,52 @@ private addCircleAnimation(circle: SVGCircleElement, line: LineData, index: numb
   circle.appendChild(animateY);
 }
 
-  private showTooltip(event: MouseEvent, text: String, info: String, activo: String, reactivo: String): void {
-    const tooltip = document.getElementById('tooltip');
-    if (tooltip) {
-      tooltip.innerHTML = `<b>Línea ${info}</b><p><b>Transferencia:</b>${text}</p><p><b>Potencia Activa: </b>${activo}</p><p><b>Potencia Reactiva: </b>${reactivo}</p>`;
+private showTooltip(event: MouseEvent, text: String, info: String, activo: String, reactivo: String): void {
+  const tooltip = document.getElementById('tooltip');
+  if (tooltip) {
+      tooltip.innerHTML = `
+          <div class="tooltip-title">
+              <b>${info}</b>
+          </div>
+          <div class="tooltip-row">
+              <b>Transferencia:</b><span>${text}</span>
+          </div>
+          <div class="tooltip-row">
+              <b>Potencia activa:</b><span>${activo}</span>
+          </div>
+          <div class="tooltip-row">
+              <b>Potencia reactiva:</b><span>${reactivo}</span>
+          </div>
+      `;
+
+      // Mostrar tooltip
       tooltip.style.opacity = '1';
-      tooltip.style.left = `${event.pageX + 10}px`;
-      tooltip.style.top = `${event.pageY + 10}px`;
-    }
+
+      // Calcular límites del viewport
+      const tooltipWidth = tooltip.offsetWidth;
+      const tooltipHeight = tooltip.offsetHeight;
+      const pageWidth = window.innerWidth;
+      const pageHeight = window.innerHeight;
+
+      let left = event.pageX + 10; // Posición por defecto a la derecha del cursor
+      let top = event.pageY + 10;  // Posición por defecto debajo del cursor
+
+      // Ajustar si excede los límites horizontales
+      if (left + tooltipWidth > pageWidth) {
+          left = pageWidth - tooltipWidth - 10; // Mueve el tooltip hacia la izquierda
+      }
+
+      // Ajustar si excede los límites verticales
+      if (top + tooltipHeight > pageHeight) {
+          top = pageHeight - tooltipHeight - 10; // Mueve el tooltip hacia arriba
+      }
+
+      // Ajustar estilos del tooltip
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
   }
+}
+
 
   private moveTooltip(event: MouseEvent): void {
     const tooltip = document.getElementById('tooltip');
