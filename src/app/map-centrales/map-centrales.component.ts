@@ -94,7 +94,7 @@ private procesarDatos(data: any[]) {
 }
 
   fetchGenerators() {
-    this.http.get<any[]>('https://190.181.35.6:5000/WebApiGeneradores')
+    this.http.get<any[]>('https://190.181.35.6:5001/WebApiGeneradores')
       .subscribe({
         next: (data) => {
           this.circleData = data;

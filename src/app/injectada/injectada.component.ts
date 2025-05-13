@@ -98,6 +98,7 @@ export class InjectadaComponent implements OnInit, OnDestroy {
                 }
               },
               yAxis: { title: { text: 'MWh' } },
+              credits: { enabled: false },
               legend: { align: 'center', verticalAlign: 'bottom' },
               tooltip: {
                 shared: true,

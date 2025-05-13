@@ -45,6 +45,7 @@ export class PieChartComponent implements OnInit {
     accessibility: {
       enabled: false,
     },
+    credits: { enabled: false },
     plotOptions: {
       pie: {
         size: '70%',

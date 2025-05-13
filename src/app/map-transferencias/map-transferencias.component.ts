@@ -68,7 +68,7 @@ export class MapTransferenciasComponent implements OnInit {
 
   
   private fetchData(): void {
-    this.http.get<any[]>('https://190.181.35.6:5000/WebApiRTransferencias').subscribe({
+    this.http.get<any[]>('https://190.181.35.6:5001/WebApiRTransferencias').subscribe({
       next: (apiResponse) => {
         this.data.lines = this.mapApiResponse(apiResponse);
         console.log('respuesta', apiResponse)
