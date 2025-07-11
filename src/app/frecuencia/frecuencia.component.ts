@@ -32,15 +32,20 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   }
 
   private initializeHistoricalData() {
-    const now = Date.now();
+    // Usamos new Date() en lugar de Date.now() para tener control de la zona horaria
+    const now = new Date();
+    
     // Crear 50 puntos históricos estáticos
     for (let i = 0; i < this.maxSeconds; i++) {
+      const pointDate = new Date(now);
+      pointDate.setSeconds(pointDate.getSeconds() - (this.maxSeconds - i));
+      
       this.dataPoints.push([
-        now - (this.maxSeconds - i) * 1000,
-        Number((Math.random() * (50.05 - 49.95) + 49.95).toFixed(2))
+        pointDate.getTime(), // Convertir a timestamp
+        Number((Math.random() * (50.05 - 49.95) + 49.95).toFixed(2)) // Se añadió el paréntesis que faltaba
       ]);
     }
-  }
+}
 
   private initializeChart() {
     this.chartOptions = this.buildChartOptions();
@@ -61,12 +66,12 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   }
 
   private updateChartData(frequency: number) {
-    const newPoint = [Date.now(), frequency];
+     const now = new Date(); // Usamos la fecha actual con zona horaria
+    const newPoint = [now.getTime(), frequency];
     
-    // Mantener histórico + nuevo punto
     this.dataPoints = [
-      ...this.dataPoints.slice(1),  // Conservar todos excepto el más antiguo
-      newPoint                      // Añadir nuevo punto
+      ...this.dataPoints.slice(1),
+      newPoint
     ];
   }
 
@@ -92,8 +97,18 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
         max: this.dataPoints[this.dataPoints.length - 1][0],
         labels: {
           formatter: function() {
-            return Highcharts.dateFormat('%H:%M:%S', this.value as number);
+            // Formatear la fecha incluyendo horas, minutos y segundos
+            const date = new Date(this.value as number);
+            return date.toLocaleTimeString('es-ES', {
+              hour: '2-digit',
+              minute: '2-digit',
+              second: '2-digit',
+              hour12: false
+            });
           }
+        },
+        title: {
+          text: 'Hora Actual'
         }
       },
       yAxis: {
