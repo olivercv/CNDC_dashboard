@@ -105,6 +105,39 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
   }
   
   private updateChart(seriesData: Highcharts.SeriesOptionsType[], fecha: string, baseDate: Date) {
+    const xAxisOptions: Highcharts.XAxisOptions = {
+      title: { text: 'Horas' },
+      type: 'datetime',
+      min: baseDate.getTime(), // Eliminamos el ajuste de +900000 para empezar en 00:00 exacto
+      max: baseDate.getTime() + 86400000, // 24 horas después
+      labels: {
+        format: '{value:%H:%M}',
+        formatter: function (
+          this: Highcharts.AxisLabelsFormatterContextObject
+        ) {
+          const date = new Date(Number(this.value));
+          // Mostrar 24:00 en el último tick
+          if (date.getTime() === baseDate.getTime() + 86400000) {
+            return '24:00';
+          }
+          return Highcharts.dateFormat('%H:%M', Number(this.value));
+        },
+      },
+      crosshair: { width: 1, color: '#ccc' },
+      tickPositioner: ((min: number, max: number) => {
+        const positions: number[] = [];
+        const interval = 3600000 * 3;
+
+        positions.push(min);
+
+        for (let i = min + interval; i < max; i += interval) {
+          positions.push(i);
+        }
+        positions.push(max);
+        return positions;
+      }) as Highcharts.AxisTickPositionerCallbackFunction,
+    };
+
     this.chartOptions = {
       chart: {
         type: 'spline',
@@ -116,26 +149,7 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
       subtitle: {
         text: `Fecha: ${fecha}`
       },
-      xAxis: {
-        type: 'datetime',
-        dateTimeLabelFormats: {
-          hour: '%H:%M',
-          day: '%e. %b'
-        },
-        title: {
-          text: 'Hora'
-        },
-        min: baseDate.getTime(), // Inicio a las 00:00
-        max: baseDate.getTime() + 86399999, // Fin a las 23:59:59.999
-        tickInterval: 3600000 * 3, // Cada 3 horas
-        labels: {
-          formatter: function() {
-            // Asegurarse de que this.value sea tratado como número
-            const timestamp = typeof this.value === 'string' ? parseFloat(this.value) : this.value;
-            return Highcharts.dateFormat('%H:%M', timestamp);
-          }
-        }
-      },
+      xAxis: xAxisOptions,
       yAxis: {
         title: {
           text: 'MW'

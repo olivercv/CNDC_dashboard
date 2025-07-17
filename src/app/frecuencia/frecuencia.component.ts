@@ -3,22 +3,26 @@ import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { LiveDataService } from '../live-data.service'; // Asegúrate de importar el servicio
 import { Subscription } from 'rxjs';
+import { DatePipe } from '@angular/common'; 
 
 @Component({
   selector: 'app-frecuencia',
   standalone: true,
   imports: [HighchartsChartModule],
   templateUrl: './frecuencia.component.html',
-  styleUrls: ['./frecuencia.component.css']
+  styleUrls: ['./frecuencia.component.css'],
+  providers: [DatePipe]
 })
 export class FrecuenciaComponent implements OnInit, OnDestroy {
+  fechaTiempoReal: Date = new Date();
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions!: Highcharts.Options;
   private dataPoints: number[][] = [];
   private readonly maxSeconds = 50;
   private liveDataSubscription!: Subscription;
+  
 
-  constructor(private cdr: ChangeDetectorRef, private liveDataService: LiveDataService) {
+  constructor(private datePipe: DatePipe, private cdr: ChangeDetectorRef, private liveDataService: LiveDataService) {
     this.initializeHistoricalData();
   }
 
@@ -29,6 +33,11 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.unsubscribeFromLiveData();
+  }
+
+  formatearFecha(): string | null {
+    return this.datePipe.transform(this.fechaTiempoReal, 'dd-MM-yy HH:mm:ss');
+
   }
 
   private initializeHistoricalData() {
@@ -76,6 +85,8 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   }
 
   private buildChartOptions(): Highcharts.Options {
+    const fechaTiempoReal = new Date();
+    const formattedDate = this.datePipe.transform(fechaTiempoReal, 'dd-MM-yy HH:mm:ss');
     return {
       chart: {
         type: 'spline',
@@ -91,6 +102,14 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
           color: '#2c3e50'
         }
       },
+      subtitle: { 
+        text: `Datos en tiempo real en Fecha: ${formattedDate}`,
+        style: {
+          fontSize: '14px',
+          color: '#2c3e50'
+        } 
+      },
+        
       xAxis: {
         type: 'datetime',
         min: this.dataPoints[0][0],
