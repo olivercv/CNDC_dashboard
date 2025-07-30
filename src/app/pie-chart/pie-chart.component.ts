@@ -40,7 +40,7 @@ export class PieChartComponent implements OnInit {
       text: 'Porcentaje de Participación'
     },
     tooltip: {
-      pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>',
+      pointFormat: '<b>{point.percentage:.1f}%</b>',
     },
     accessibility: {
       enabled: false,

@@ -152,7 +152,7 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
       xAxis: xAxisOptions,
       yAxis: {
         title: {
-          text: 'MW'
+          text: 'MWh/$us'
         },
         min: 0
       },

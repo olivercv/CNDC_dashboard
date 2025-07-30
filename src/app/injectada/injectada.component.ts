@@ -23,26 +23,11 @@ export class InjectadaComponent implements OnInit, OnDestroy {
     color: string;
   }[] = [
     // Estilos personalizados
-    {
-      name: 'TERMO',
-      dashStyle: 'Solid',
-      realName: 'Termoeléctrica',
-      color: '#E3371E',
-    },
-    {
-      name: 'HIDRO',
-      dashStyle: 'Solid',
-      realName: 'Hidroeléctrica',
-      color: '#3188e5',
-    },
+    { name: 'TERMO', dashStyle: 'Solid', realName: 'Termoeléctrica', color: '#E3371E'},
+    { name: 'HIDRO', dashStyle: 'Solid', realName: 'Hidroeléctrica', color: '#3188e5'},
     { name: 'SOLAR', dashStyle: 'Solid', realName: 'Solar', color: '#fab610' },
     { name: 'EOL', dashStyle: 'Solid', realName: 'Eólica', color: '#103778' },
-    {
-      name: 'BAGAZO',
-      dashStyle: 'Solid',
-      realName: 'BAGAZO',
-      color: '#A6BC09',
-    },
+    { name: 'BAGAZO', dashStyle: 'Solid', realName: 'Bagazo', color: '#A6BC09'},
     { name: 'SIS', dashStyle: 'Solid', realName: 'Total', color: '#CACACA' },
   ];
 
