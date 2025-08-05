@@ -1,6 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { LiveDataService } from '../live-data.service';
+import { LiveDataService } from '../services/live-data.service'
 
 type RegionKey = 'norte' | 'este' | 'sur';
 
@@ -59,9 +59,10 @@ export class MapTransferenciasComponent implements OnInit {
 
   ngOnInit(): void {
     this.liveDataService.getLiveData().subscribe(data => {
-      this.frequency = `${data.frequency.toString()} Hz`;
-      this.dateTime = data.dateTime;
-    });
+  this.frequency = `${data.frequency.toFixed(3)} Hz`; // 3 decimales
+  this.dateTime = new Date(data.timestamp).toLocaleString('es-BO'); // hora local
+});
+
     // this.fetchData();
     this.loadFallbackData();
   }

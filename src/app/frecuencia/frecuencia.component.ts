@@ -1,14 +1,18 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
-import { LiveDataService } from '../live-data.service'; // Asegúrate de importar el servicio
+import { LiveDataService } from '../services/live-data.service';
 import { Subscription } from 'rxjs';
 import { DatePipe } from '@angular/common'; 
+import { catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
+
 
 @Component({
   selector: 'app-frecuencia',
   standalone: true,
-  imports: [HighchartsChartModule],
+  imports: [HighchartsChartModule, CommonModule],
   templateUrl: './frecuencia.component.html',
   styleUrls: ['./frecuencia.component.css'],
   providers: [DatePipe]
@@ -20,52 +24,54 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   private dataPoints: number[][] = [];
   private readonly maxSeconds = 50;
   private liveDataSubscription!: Subscription;
-  
+  errorMessage: string | null = null;
 
-  constructor(private datePipe: DatePipe, private cdr: ChangeDetectorRef, private liveDataService: LiveDataService) {
-    this.initializeHistoricalData();
-  }
+
+  constructor(
+    private datePipe: DatePipe,
+    private cdr: ChangeDetectorRef,
+    private liveDataService: LiveDataService
+  ) {}
 
   ngOnInit() {
+    this.liveDataService.getHistoricalData(this.maxSeconds).pipe(
+    catchError(error => {
+      this.errorMessage = '❌ Error al cargar el historial: ' + error.message;
+      return of([]); // devuelve lista vacía para no romper la app
+    })
+  ).subscribe(historicalData => {
+    this.dataPoints = historicalData;
     this.initializeChart();
     this.subscribeToLiveData();
+  });
   }
 
   ngOnDestroy() {
     this.unsubscribeFromLiveData();
   }
 
-  formatearFecha(): string | null {
-    return this.datePipe.transform(this.fechaTiempoReal, 'dd-MM-yy HH:mm:ss');
-
-  }
-
-  private initializeHistoricalData() {
-    // Usamos new Date() en lugar de Date.now() para tener control de la zona horaria
-    const now = new Date();
-    
-    // Crear 50 puntos históricos estáticos
-    for (let i = 0; i < this.maxSeconds; i++) {
-      const pointDate = new Date(now);
-      pointDate.setSeconds(pointDate.getSeconds() - (this.maxSeconds - i));
-      
-      this.dataPoints.push([
-        pointDate.getTime(), // Convertir a timestamp
-        Number((Math.random() * (50.05 - 49.95) + 49.95).toFixed(2)) // Se añadió el paréntesis que faltaba
-      ]);
-    }
-}
-
   private initializeChart() {
     this.chartOptions = this.buildChartOptions();
   }
 
   private subscribeToLiveData() {
-    this.liveDataSubscription = this.liveDataService.getLiveData().subscribe(data => {
-      this.updateChartData(data.frequency);
-      this.chartOptions = this.buildChartOptions();
-      this.cdr.detectChanges();
-    });
+     this.liveDataSubscription = this.liveDataService.getLiveData().pipe(
+    catchError(error => {
+      this.errorMessage = '❌ Error al obtener datos en tiempo real: ' + error.message;
+      return of(null); // Detiene actualizaciones sin romper la app
+    })
+  ).subscribe(data => {
+    if (!data) return;
+
+    const newPoint: [number, number] = [data.timestamp, data.frequency];
+    this.dataPoints = [...this.dataPoints.slice(1), newPoint];
+
+    (this.chartOptions.series![0] as Highcharts.SeriesSplineOptions).data = this.dataPoints;
+    this.chartOptions.subtitle = { 
+      text: `Datos en tiempo real en Fecha: ${this.datePipe.transform(new Date(), 'dd-MM-yy HH:mm:ss')}`
+    };
+    this.cdr.detectChanges();
+  });
   }
 
   private unsubscribeFromLiveData() {
@@ -74,49 +80,27 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
     }
   }
 
-  private updateChartData(frequency: number) {
-     const now = new Date(); // Usamos la fecha actual con zona horaria
-    const newPoint = [now.getTime(), frequency];
-    
-    this.dataPoints = [
-      ...this.dataPoints.slice(1),
-      newPoint
-    ];
-  }
-
   private buildChartOptions(): Highcharts.Options {
-    const fechaTiempoReal = new Date();
-    const formattedDate = this.datePipe.transform(fechaTiempoReal, 'dd-MM-yy HH:mm:ss');
     return {
       chart: {
         type: 'spline',
         animation: true,
         events: {
-          load: () => this.handleChartLoad()
+          load: () => setTimeout(() => window.dispatchEvent(new Event('resize')), 100)
         }
       },
       title: {
         text: 'Frecuencia en Tiempo Real',
-        style: {
-          fontSize: '20px',
-          color: '#2c3e50'
-        }
+        style: { fontSize: '20px', color: '#2c3e50' }
       },
       subtitle: { 
-        text: `Datos en tiempo real en Fecha: ${formattedDate}`,
-        style: {
-          fontSize: '14px',
-          color: '#2c3e50'
-        } 
+        text: `Datos en tiempo real en Fecha: ${this.datePipe.transform(new Date(), 'dd-MM-yy HH:mm:ss')}`,
+        style: { fontSize: '14px', color: '#2c3e50' }
       },
-        
       xAxis: {
         type: 'datetime',
-        min: this.dataPoints[0][0],
-        max: this.dataPoints[this.dataPoints.length - 1][0],
         labels: {
           formatter: function() {
-            // Formatear la fecha incluyendo horas, minutos y segundos
             const date = new Date(this.value as number);
             return date.toLocaleTimeString('es-ES', {
               hour: '2-digit',
@@ -126,15 +110,17 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
             });
           }
         },
-        title: {
-          text: 'Hora Actual'
-        }
+        title: { text: 'Hora Actual' }
       },
       yAxis: {
         title: { text: 'Hz' },
         min: 49.50,
         max: 50.50,
-        plotLines: this.getReferenceLines()
+        plotLines: [
+          { value: 50, color: '#2C6CBF', width: 3, dashStyle: 'Dot' },
+          { value: 50.25, color: '#D92211', width: 2, dashStyle: 'Dot', label: { text: '50.25 Hz' } },
+          { value: 49.75, color: '#D92211', width: 2, dashStyle: 'Dot', label: { text: '49.75 Hz' } }
+        ]
       },
       series: [{
         name: 'Frecuencia',
@@ -151,34 +137,5 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
       },
       credits: { enabled: false }
     };
-  }
-
-  private getReferenceLines(): Highcharts.AxisPlotLinesOptions[] {
-    return [
-      {
-        value: 50,
-        color: '#2C6CBF',
-        width: 3,
-        dashStyle: 'Dot',
-        label: { text: '' }
-      }, {
-        value: 50.25,
-        color: '#D92211',
-        width: 2,
-        dashStyle: 'Dot',
-        label: { text: '50.25 Hz' }
-      },
-      {
-        value: 49.75,
-        color: '#D92211',
-        width: 2,
-        dashStyle: 'Dot',
-        label: { text: '49.75 Hz' }
-      }
-    ];
-  }
-
-  private handleChartLoad() {
-    setTimeout(() => window.dispatchEvent(new Event('resize')), 100);
   }
 }
