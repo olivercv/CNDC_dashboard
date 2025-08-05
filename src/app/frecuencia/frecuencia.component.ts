@@ -1,13 +1,10 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import * as Highcharts from 'highcharts';
 import { HighchartsChartModule } from 'highcharts-angular';
 import { LiveDataService } from '../services/live-data.service';
-import { Subscription } from 'rxjs';
-import { DatePipe } from '@angular/common'; 
+import { Subscription, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { of } from 'rxjs';
-
 
 @Component({
   selector: 'app-frecuencia',
@@ -18,36 +15,43 @@ import { of } from 'rxjs';
   providers: [DatePipe]
 })
 export class FrecuenciaComponent implements OnInit, OnDestroy {
-  fechaTiempoReal: Date = new Date();
   Highcharts: typeof Highcharts = Highcharts;
   chartOptions!: Highcharts.Options;
+  chartCallback!: (chart: Highcharts.Chart) => void;
+  chartRef!: Highcharts.Chart;
   private dataPoints: number[][] = [];
   private readonly maxSeconds = 50;
   private liveDataSubscription!: Subscription;
   errorMessage: string | null = null;
 
-
   constructor(
     private datePipe: DatePipe,
     private cdr: ChangeDetectorRef,
     private liveDataService: LiveDataService
-  ) {}
+  ) {
+    // ✅ Captura de instancia del gráfico
+    this.chartCallback = (chart) => {
+      this.chartRef = chart;
+    };
+  }
 
   ngOnInit() {
     this.liveDataService.getHistoricalData(this.maxSeconds).pipe(
-    catchError(error => {
-      this.errorMessage = '❌ Error al cargar el historial: ' + error.message;
-      return of([]); // devuelve lista vacía para no romper la app
-    })
-  ).subscribe(historicalData => {
-    this.dataPoints = historicalData;
-    this.initializeChart();
-    this.subscribeToLiveData();
-  });
+      catchError(error => {
+        this.errorMessage = '❌ Error al cargar el historial: ' + error.message;
+        return of([]);
+      })
+    ).subscribe(historicalData => {
+      this.dataPoints = historicalData;
+      this.initializeChart();
+      this.subscribeToLiveData();
+    });
   }
 
   ngOnDestroy() {
-    this.unsubscribeFromLiveData();
+    if (this.liveDataSubscription) {
+      this.liveDataSubscription.unsubscribe();
+    }
   }
 
   private initializeChart() {
@@ -55,62 +59,52 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   }
 
   private subscribeToLiveData() {
-     this.liveDataSubscription = this.liveDataService.getLiveData().pipe(
-    catchError(error => {
-      this.errorMessage = '❌ Error al obtener datos en tiempo real: ' + error.message;
-      return of(null); // Detiene actualizaciones sin romper la app
-    })
-  ).subscribe(data => {
-    if (!data) return;
+    this.liveDataSubscription = this.liveDataService.getLiveData().pipe(
+      catchError(error => {
+        this.errorMessage = '❌ Error en tiempo real: ' + error.message;
+        return of(null);
+      })
+    ).subscribe(data => {
+      if (!data || !this.chartRef) return;
 
-    const newPoint: [number, number] = [data.timestamp, data.frequency];
-    this.dataPoints = [...this.dataPoints.slice(1), newPoint];
+      const newPoint: [number, number] = [data.timestamp, data.frequency];
+      const series = this.chartRef.series[0];
+      const shouldShift = this.dataPoints.length >= this.maxSeconds;
 
-    (this.chartOptions.series![0] as Highcharts.SeriesSplineOptions).data = this.dataPoints;
-    this.chartOptions.subtitle = { 
-      text: `Datos en tiempo real en Fecha: ${this.datePipe.transform(new Date(), 'dd-MM-yy HH:mm:ss')}`
-    };
-    this.cdr.detectChanges();
-  });
-  }
+      series.addPoint(newPoint, true, shouldShift);
+      this.dataPoints.push(newPoint);
+      if (shouldShift) this.dataPoints.shift();
 
-  private unsubscribeFromLiveData() {
-    if (this.liveDataSubscription) {
-      this.liveDataSubscription.unsubscribe();
-    }
+      this.chartRef.setSubtitle({
+        text: `Actualizado: ${this.datePipe.transform(new Date(), 'dd-MM-yy HH:mm:ss')}`
+      });
+    });
   }
 
   private buildChartOptions(): Highcharts.Options {
     return {
       chart: {
         type: 'spline',
-        animation: true,
-        events: {
-          load: () => setTimeout(() => window.dispatchEvent(new Event('resize')), 100)
-        }
+        animation: true
       },
       title: {
         text: 'Frecuencia en Tiempo Real',
         style: { fontSize: '20px', color: '#2c3e50' }
       },
-      subtitle: { 
-        text: `Datos en tiempo real en Fecha: ${this.datePipe.transform(new Date(), 'dd-MM-yy HH:mm:ss')}`,
+      subtitle: {
+        text: `Inicializado: ${this.datePipe.transform(new Date(), 'dd-MM-yy HH:mm:ss')}`,
         style: { fontSize: '14px', color: '#2c3e50' }
       },
       xAxis: {
         type: 'datetime',
         labels: {
-          formatter: function() {
-            const date = new Date(this.value as number);
-            return date.toLocaleTimeString('es-ES', {
-              hour: '2-digit',
-              minute: '2-digit',
-              second: '2-digit',
-              hour12: false
+          formatter: function () {
+            return new Date(this.value as number).toLocaleTimeString('es-ES', {
+              hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
             });
           }
         },
-        title: { text: 'Hora Actual' }
+        title: { text: 'Hora' }
       },
       yAxis: {
         title: { text: 'Hz' },
