@@ -125,10 +125,19 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
         marker: { enabled: false }
       }],
       tooltip: {
-        valueDecimals: 2,
-        headerFormat: '<small>{point.key:%H:%M:%S}</small><br>',
-        pointFormat: '<b>{point.y} Hz</b>'
+      valueDecimals: 2,
+        formatter: function () {
+          const fechaLocal = new Date(this.x as number).toLocaleTimeString('es-ES', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false
+          });
+
+          return `<small>${fechaLocal}</small><br><b>${this.y} Hz</b>`;
+        }
       },
+
       credits: { enabled: false }
     };
   }
