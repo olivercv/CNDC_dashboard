@@ -150,7 +150,7 @@ fetchData() {
       tooltip: {
         shared: true,
         headerFormat: '<b>{point.key:%H:%M}</b><br/>',
-        pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y:.2f}</b> MW<br/>',
+        pointFormat: '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y:.2f}</b> $us/MWh<br/>',
         animation: true
       },
       plotOptions: {
