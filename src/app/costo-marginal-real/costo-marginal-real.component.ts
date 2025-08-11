@@ -38,71 +38,62 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
   }
 
   private formatDate(dateString: string): string {
-    // Convertir "16.03.2025" a "2025-03-16"
-    const parts = dateString.split(".");
-    if (parts.length !== 3) {
-        console.error("Formato incorrecto:", dateString);
-        return "Fecha inválida";
-    }
+  // Convierte "07.08.2025" en "07/08/2025"
+  const parts = dateString.split(".");
+  if (parts.length !== 3) {
+    console.error("Formato incorrecto:", dateString);
+    return "Fecha inválida";
+  }
 
-    const [day, month, year] = parts;
-    const formattedDate = `${year}-${month}-${day}`; // Formato compatible con Date
-
-    const date = new Date(formattedDate);
-    if (isNaN(date.getTime())) {
-        console.error("Fecha inválida:", dateString);
-        return "Fecha inválida";
-    }
-
-    return new Intl.DateTimeFormat("es-ES", { day: "2-digit", month: "2-digit", year: "numeric" }).format(date);
+  const [day, month, year] = parts;
+  return `${day}/${month}/${year}`;
 }
 
+fetchData() {
+  const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
+  const code = 5; // POSTDESPACHO
 
-  fetchData() {
-    const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
-    const code = 5; // Código para POSTDESPACHO
-  
-    this.http.get<any[]>(fechaApiUrl).subscribe({
-      next: (fechas) => {
-        const postdespachoDate = fechas.find(f => f.tipo === 'POSTDESPACHO')?.fecha;
-        if (!postdespachoDate) return;
-        
-        // Ajustar baseDate a las 00:00 del día
-        const baseDate = new Date(postdespachoDate.split('.').reverse().join('-'));
-        baseDate.setUTCHours(0, 0, 0, 0); // Fijar a medianoche en UTC
-        
-        const formattedDate = this.formatDate(postdespachoDate);
-        // console.log('FECHA ', formattedDate);
-        const dataApiUrl = `https://cndcapi.cndc.bo/WebApi?code=${code}&Fecha=${formattedDate}`;
-  
-        this.http.get<any[]>(dataApiUrl).subscribe({
-          next: (apiData) => {
-            const seriesData: any = apiData.map(item => ({
-              name: item.codigo.toUpperCase(),
-              type: 'spline',
-              lineWidth: 3, // Grosor de línea aumentado
-              data: item.valores.map((val: number, index: number) => {
-                const timestamp = baseDate.getTime() + (index * 3600000); // Intervalos de 1 hora
-                return [timestamp, val];
-              }),
-              marker: {
-                enabled: true, // Asegurar que los marcadores estén habilitados
-                symbol: 'circle',
-                radius: 2, // Tamaño aumentado
-                fillColor: '#FFFFFF',
-                lineColor: '#058DC7', // Color del borde igual a la serie
-                lineWidth: 2
-              }
-            }));
-  
-            this.updateChart(seriesData, formattedDate, baseDate);
-          },
-          error: (error) => console.error('Error fetching data:', error)
-        });
-      },
-      error: (error) => console.error('Error fetching dates:', error)
-    });
-  }
+  this.http.get<any[]>(fechaApiUrl).subscribe({
+    next: (fechas) => {
+      const postdespachoDate = fechas.find(f => f.tipo === 'POSTDESPACHO')?.fecha;
+      if (!postdespachoDate) return;
+
+      // Crear baseDate en hora local
+      const [day, month, year] = postdespachoDate.split('.').map(Number);
+      const baseDate = new Date(year, month - 1, day, 0, 0, 0, 0); // Local
+
+      const formattedDate = this.formatDate(postdespachoDate); // dd/MM/yyyy
+      const dataApiUrl = `https://cndcapi.cndc.bo/WebApi?code=${code}&Fecha=${formattedDate}`;
+
+      this.http.get<any[]>(dataApiUrl).subscribe({
+        next: (apiData) => {
+          const seriesData: any = apiData.map(item => ({
+            name: 'CMR',
+            type: 'spline',
+            lineWidth: 3,
+            data: item.valores.map((val: number, index: number) => {
+              const timestamp = baseDate.getTime() + (index * 3600000);
+              return [timestamp, val];
+            }),
+            marker: {
+              enabled: true,
+              symbol: 'circle',
+              radius: 2,
+              fillColor: '#FFFFFF',
+              lineColor: '#058DC7',
+              lineWidth: 2
+            }
+          }));
+
+          this.updateChart(seriesData, formattedDate, baseDate);
+        },
+        error: (error) => console.error('Error fetching data:', error)
+      });
+    },
+    error: (error) => console.error('Error fetching dates:', error)
+  });
+}
+
   
   private updateChart(seriesData: Highcharts.SeriesOptionsType[], fecha: string, baseDate: Date) {
     const xAxisOptions: Highcharts.XAxisOptions = {
@@ -152,7 +143,7 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
       xAxis: xAxisOptions,
       yAxis: {
         title: {
-          text: 'MWh/$us'
+          text: '$us/MWh'
         },
         min: 0
       },
