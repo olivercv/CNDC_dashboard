@@ -28,6 +28,7 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
   }
 
   startAutoRefresh() {
+    // Puedes activar el refresco automático si quieres
     // this.zone.runOutsideAngular(() => {
     //   this.intervalId = setInterval(() => this.fetchData(), 15000);
     // });
@@ -38,96 +39,92 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
   }
 
   private formatDate(dateString: string): string {
-  // Convierte "07.08.2025" en "07/08/2025"
-  const parts = dateString.split(".");
-  if (parts.length !== 3) {
-    console.error("Formato incorrecto:", dateString);
-    return "Fecha inválida";
+    // Convierte "07.08.2025" en "07/08/2025"
+    const parts = dateString.split(".");
+    if (parts.length !== 3) {
+      console.error("Formato incorrecto:", dateString);
+      return "Fecha inválida";
+    }
+
+    const [day, month, year] = parts;
+    return `${day}/${month}/${year}`;
   }
 
-  const [day, month, year] = parts;
-  return `${day}/${month}/${year}`;
-}
+  fetchData() {
+    const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
+    const code = 5; // POSTDESPACHO
 
-fetchData() {
-  const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
-  const code = 5; // POSTDESPACHO
+    this.http.get<any[]>(fechaApiUrl).subscribe({
+      next: (fechas) => {
+        const postdespachoDate = fechas.find(f => f.tipo === 'POSTDESPACHO')?.fecha;
+        if (!postdespachoDate) return;
 
-  this.http.get<any[]>(fechaApiUrl).subscribe({
-    next: (fechas) => {
-      const postdespachoDate = fechas.find(f => f.tipo === 'POSTDESPACHO')?.fecha;
-      if (!postdespachoDate) return;
+        // Crear baseDate en hora UTC a las 00:00
+        const [day, month, year] = postdespachoDate.split('.').map(Number);
+        const baseDate = Date.UTC(year, month - 1, day, 0, 0, 0); // timestamp en ms UTC
 
-      // Crear baseDate en hora local
-      const [day, month, year] = postdespachoDate.split('.').map(Number);
-      const baseDate = new Date(year, month - 1, day, 0, 0, 0, 0); // Local
+        const formattedDate = this.formatDate(postdespachoDate); // dd/MM/yyyy
+        const dataApiUrl = `https://cndcapi.cndc.bo/WebApi?code=${code}&Fecha=${formattedDate}`;
 
-      const formattedDate = this.formatDate(postdespachoDate); // dd/MM/yyyy
-      const dataApiUrl = `https://cndcapi.cndc.bo/WebApi?code=${code}&Fecha=${formattedDate}`;
+        this.http.get<any[]>(dataApiUrl).subscribe({
+          next: (apiData) => {
+            const seriesData: any = apiData.map(item => ({
+              name: 'CMR',
+              type: 'spline',
+              lineWidth: 3,
+              data: (() => {
+                const dataPoints = item.valores.map((val: number, index: number) => {
+                  const timestamp = baseDate + index * 3600000;
+                  return [timestamp, val];
+                });
+                const lastTimestamp = baseDate + 23 * 3600000;
+                const lastValue = item.valores[item.valores.length - 1];
+                dataPoints.push([lastTimestamp + 3600000, lastValue]);
+                return dataPoints;
+              })(),
+              marker: {
+                enabled: true,
+                symbol: 'circle',
+                radius: 2,
+                fillColor: '#FFFFFF',
+                lineColor: '#058DC7',
+                lineWidth: 2
+              }
+            }));
 
-      this.http.get<any[]>(dataApiUrl).subscribe({
-        next: (apiData) => {
-          const seriesData: any = apiData.map(item => ({
-            name: 'CMR',
-            type: 'spline',
-            lineWidth: 3,
-            data: item.valores.map((val: number, index: number) => {
-              const timestamp = baseDate.getTime() + (index * 3600000);
-              return [timestamp, val];
-            }),
-            marker: {
-              enabled: true,
-              symbol: 'circle',
-              radius: 2,
-              fillColor: '#FFFFFF',
-              lineColor: '#058DC7',
-              lineWidth: 2
-            }
-          }));
 
-          this.updateChart(seriesData, formattedDate, baseDate);
-        },
-        error: (error) => console.error('Error fetching data:', error)
-      });
-    },
-    error: (error) => console.error('Error fetching dates:', error)
-  });
-}
-
-  
-  private updateChart(seriesData: Highcharts.SeriesOptionsType[], fecha: string, baseDate: Date) {
-    const xAxisOptions: Highcharts.XAxisOptions = {
-      title: { text: 'Horas' },
-      type: 'datetime',
-      min: baseDate.getTime(), // Eliminamos el ajuste de +900000 para empezar en 00:00 exacto
-      max: baseDate.getTime() + 86400000, // 24 horas después
-      labels: {
-        format: '{value:%H:%M}',
-        formatter: function (
-          this: Highcharts.AxisLabelsFormatterContextObject
-        ) {
-          const date = new Date(Number(this.value));
-          // Mostrar 24:00 en el último tick
-          if (date.getTime() === baseDate.getTime() + 86400000) {
-            return '24:00';
-          }
-          return Highcharts.dateFormat('%H:%M', Number(this.value));
-        },
+            this.updateChart(seriesData, formattedDate, baseDate);
+          },
+          error: (error) => console.error('Error fetching data:', error)
+        });
       },
-      crosshair: { width: 1, color: '#ccc' },
-      tickPositioner: ((min: number, max: number) => {
-        const positions: number[] = [];
-        const interval = 3600000 * 3;
+      error: (error) => console.error('Error fetching dates:', error)
+    });
+  }
 
-        positions.push(min);
+  private updateChart(seriesData: Highcharts.SeriesOptionsType[], fecha: string, baseDate: number) {
+    const base = baseDate; // Capturar timestamp para closures
 
-        for (let i = min + interval; i < max; i += interval) {
-          positions.push(i);
-        }
-        positions.push(max);
-        return positions;
-      }) as Highcharts.AxisTickPositionerCallbackFunction,
-    };
+   const xAxisOptions: Highcharts.XAxisOptions = {
+  title: { text: 'Horas' },
+  type: 'datetime',
+  min: base,
+  max: base + 86400000, // 24 horas en ms
+  tickInterval: 3600000 * 3, // una etiqueta cada 3 horas para mejor lectura en móviles
+  labels: {
+    formatter: function () {
+      const date = new Date(this.value);
+      const hours = date.getUTCHours().toString().padStart(2, '0');
+      const minutes = date.getUTCMinutes().toString().padStart(2, '0');
+      if (this.value === base + 86400000) {
+        return '24:00';
+      }
+      return `${hours}:${minutes}`;
+    }
+  },
+  crosshair: { width: 1, color: '#ccc' },
+};
+
 
     this.chartOptions = {
       chart: {
@@ -158,7 +155,7 @@ fetchData() {
           marker: {
             enabledThreshold: 0
           },
-          lineWidth: 2 // Grosor de línea consistente
+          lineWidth: 2
         }
       },
       credits: { enabled: false },

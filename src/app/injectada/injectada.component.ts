@@ -22,7 +22,6 @@ export class InjectadaComponent implements OnInit, OnDestroy {
     realName: string;
     color: string;
   }[] = [
-    // Estilos personalizados
     { name: 'TERMO', dashStyle: 'Solid', realName: 'Termoeléctrica', color: '#E3371E'},
     { name: 'HIDRO', dashStyle: 'Solid', realName: 'Hidroeléctrica', color: '#3188e5'},
     { name: 'SOLAR', dashStyle: 'Solid', realName: 'Solar', color: '#fab610' },
@@ -73,52 +72,63 @@ export class InjectadaComponent implements OnInit, OnDestroy {
               return;
             }
 
-            let seriesData = data.map((item) => ({
-              name: item.codigo,
-              data: item.valores.map((val: number, index: number) => {
-                const timestamp = baseDate.getTime() + index * 900000 * 4; // 15 minutos en ms (15 * 60 * 1000)
+            let seriesData = data.map((item) => {
+              const valores = item.valores;
+              const dataPoints = valores.map((val: number, index: number) => {
+                const timestamp = baseDate.getTime() + index * 900000 * 4; // 15min * 4 = 1 hora
                 return [timestamp, val === -1 ? null : val];
-              }),
-            }));
+              });
 
-            // Ordenar las series según el vector de estilos
+              // Agregar punto extra a las 24:00 para completar la curva
+              const lastTimestamp = baseDate.getTime() + 24 * 3600 * 1000;
+              const lastValue = valores[valores.length - 1] === -1 ? null : valores[valores.length - 1];
+              dataPoints.push([lastTimestamp, lastValue]);
+
+              return {
+                name: item.codigo,
+                data: dataPoints,
+              };
+            });
+
+            // Ordenar según estilos
             seriesData.sort((a, b) => {
               const indexA = this.styles.findIndex((s) => s.name === a.name);
               const indexB = this.styles.findIndex((s) => s.name === b.name);
               return indexA - indexB;
             });
+
             const xAxisOptions: Highcharts.XAxisOptions = {
               title: { text: 'Horas' },
               type: 'datetime',
-              min: baseDate.getTime(), // Eliminamos el ajuste de +900000 para empezar en 00:00 exacto
-              max: baseDate.getTime() + 86400000, // 24 horas después
+              min: baseDate.getTime(),
+              max: baseDate.getTime() + 24 * 3600 * 1000,
               labels: {
-                format: '{value:%H:%M}',
-                formatter: function (
-                  this: Highcharts.AxisLabelsFormatterContextObject
-                ) {
+                formatter: function (this: Highcharts.AxisLabelsFormatterContextObject) {
                   const date = new Date(Number(this.value));
-                  // Mostrar 24:00 en el último tick
-                  if (date.getTime() === baseDate.getTime() + 86400000) {
+                  if (
+                    date.getUTCHours() === 0 &&
+                    date.getUTCMinutes() === 0 &&
+                    date.getTime() !== baseDate.getTime()
+                  ) {
                     return '24:00';
                   }
                   return Highcharts.dateFormat('%H:%M', Number(this.value));
                 },
               },
               crosshair: { width: 1, color: '#ccc' },
-              tickPositioner: ((min: number, max: number) => {
+              tickPositioner: function (...args: any[]): number[] {
+                const min = args[0];
+                const max = args[1];
                 const positions: number[] = [];
-                const interval = 3600000 * 3;
+                const step = 4 * 3600 * 1000;
 
-                positions.push(min);
-
-                for (let i = min + interval; i < max; i += interval) {
-                  positions.push(i);
+                for (let pos = min; pos <= max; pos += step) {
+                  positions.push(pos);
                 }
-                positions.push(max);
                 return positions;
-              }) as Highcharts.AxisTickPositionerCallbackFunction,
+              },
             };
+
             this.chartOptions = {
               chart: {
                 type: 'area',
@@ -134,20 +144,18 @@ export class InjectadaComponent implements OnInit, OnDestroy {
                 shared: true,
                 headerFormat: '<b>{point.key:%H:%M}</b><br/>',
                 pointFormat:
-                  '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y}</b> MW<br/>',
-                animation: false, // Desactiva animaciones innecesarias
+                  '<span style="color:{point.color}">●</span> {series.name}: <b>{point.y}</b> MWh<br/>',
+                animation: false,
               },
               plotOptions: {
                 area: {
-                  pointStart: 1940,
+                  fillOpacity: 0.35,  
                   marker: {
                     enabled: false,
                     symbol: 'circle',
                     radius: 2,
                     states: {
-                      hover: {
-                        enabled: true,
-                      },
+                      hover: { enabled: true },
                     },
                   },
                 },
@@ -157,7 +165,7 @@ export class InjectadaComponent implements OnInit, OnDestroy {
                 useGPUTranslations: true,
                 allowForce: true,
               },
-              series: seriesData.map((item) => {
+              series: seriesData.reverse().map((item) => {
                 const style = this.styles.find((s) => s.name === item.name) || {
                   dashStyle: 'Solid',
                   realName: item.name,
@@ -167,14 +175,14 @@ export class InjectadaComponent implements OnInit, OnDestroy {
                   type: 'area',
                   name: style.realName,
                   data: item.data,
-                  color: style.color, // Asignar color desde el objeto de estilos
-                  dashStyle: style.dashStyle, // Asignar estilo desde el objeto de estilos
+                  color: style.color,
+                  dashStyle: style.dashStyle,
                   marker: {
-                    symbol: 'circle', // Asegurarse de que cada serie use círculos
-                    radius: 0, // El tamaño predeterminado del marcador es 0 (sin marcadores)
+                    symbol: 'circle',
+                    radius: 0,
                     states: {
                       hover: {
-                        radius: 3, // Tamaño del círculo en hover (puedes cambiar el valor)
+                        radius: 3,
                       },
                     },
                   },
@@ -182,7 +190,6 @@ export class InjectadaComponent implements OnInit, OnDestroy {
               }),
             };
 
-            // Forzar actualización del gráfico
             this.chartOptions = { ...this.chartOptions };
           },
           error: (error) => console.error('Error en datos:', error),
