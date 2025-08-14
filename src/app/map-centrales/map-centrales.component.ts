@@ -44,8 +44,8 @@ export class MapCentralesComponent implements OnInit, OnDestroy {
   constructor(private http: HttpClient, private zone: NgZone) { }
 
   ngOnInit(): void {
-    this.fetchGenerators();
-    // this.loadFallbackData();
+    // this.fetchGenerators();
+    this.loadFallbackData();
     this.fetchData();
     this.startAutoRefresh();
   }

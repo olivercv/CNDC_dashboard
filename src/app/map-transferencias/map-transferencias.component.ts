@@ -63,8 +63,8 @@ export class MapTransferenciasComponent implements OnInit {
   this.dateTime = new Date(data.timestamp).toLocaleString('es-BO'); // hora local
 });
 
-    this.fetchData();
-    // this.loadFallbackData();
+    // this.fetchData();
+    this.loadFallbackData();
   }
 
   
