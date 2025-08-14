@@ -124,7 +124,7 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
   },
   crosshair: { width: 1, color: '#ccc' },
 };
-
+  
 
     this.chartOptions = {
       chart: {

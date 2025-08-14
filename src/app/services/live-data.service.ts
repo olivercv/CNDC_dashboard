@@ -34,9 +34,10 @@ export class LiveDataService {
       )),
       map(data => {
         const now = new Date();
+        const freqNum = Number(data.frequency); 
         return {
           timestamp: now.getTime(),
-          frequency: data.frequency
+          frequency: Number(freqNum.toFixed(2))
         };
       })
     );
