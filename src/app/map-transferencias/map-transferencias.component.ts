@@ -63,13 +63,13 @@ export class MapTransferenciasComponent implements OnInit {
   this.dateTime = new Date(data.timestamp).toLocaleString('es-BO'); // hora local
 });
 
-    // this.fetchData();
-    this.loadFallbackData();
+    this.fetchData();
+    // this.loadFallbackData();
   }
 
   
   private fetchData(): void {
-    this.http.get<any[]>('https://190.181.35.6:5001/WebApiRTransferencias').subscribe({
+    this.http.get<any[]>('https://webapi.cndc.bo/WebApiRTransferencias').subscribe({
       next: (apiResponse) => {
         this.data.lines = this.mapApiResponse(apiResponse);
         console.log('respuesta', apiResponse)

@@ -44,8 +44,8 @@ export class MapCentralesComponent implements OnInit, OnDestroy {
   constructor(private http: HttpClient, private zone: NgZone) { }
 
   ngOnInit(): void {
-    // this.fetchGenerators();
-    this.loadFallbackData();
+    this.fetchGenerators();
+    // this.loadFallbackData();
     this.fetchData();
     this.startAutoRefresh();
   }
@@ -94,7 +94,7 @@ private procesarDatos(data: any[]) {
 }
 
   fetchGenerators() {
-    this.http.get<any[]>('https://190.181.35.6:5001/WebApiGeneradores')
+    this.http.get<any[]>('https://webapi.cndc.bo/WebApiGeneradores')
       .subscribe({
         next: (data) => {
           this.circleData = data;
