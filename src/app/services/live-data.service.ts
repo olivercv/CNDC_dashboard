@@ -10,21 +10,26 @@ export class LiveDataService {
   constructor(private http: HttpClient) {}
 
   // 📌 Obtener datos históricos y ajustar con hora local
-  getHistoricalData(maxPoints: number) {
-    return this.http.get<{ valor: number, hora: string }[]>(
-      `${this.baseUrl}/WebApiFrecuencia/historial?registros=${maxPoints}`
-    ).pipe(
-      map(data => {
-        const now = new Date();
-        return data.map((point, index) => {
-          // Restamos segundos para simular el historial en la hora local
-          const pointDate = new Date(now);
-          pointDate.setSeconds(pointDate.getSeconds() - (maxPoints - index));
-          return [pointDate.getTime(), point.valor];
-        });
-      })
-    );
-  }
+getHistoricalData(maxPoints: number) {
+  return this.http.get<{ valor: number | string, hora: string }[]>(
+    `${this.baseUrl}/WebApiFrecuencia/historial?registros=${maxPoints}`
+  ).pipe(
+    map(data => {
+      const now = new Date();
+      return data.map((point, index) => {
+        // Restamos segundos para simular el historial en la hora local
+        const pointDate = new Date(now);
+        pointDate.setSeconds(pointDate.getSeconds() - (maxPoints - index));
+
+        // Convertir a número y redondear a 2 decimales
+        const valorRedondeado = Number(Number(point.valor).toFixed(2));
+
+        return [pointDate.getTime(), valorRedondeado];
+      });
+    })
+  );
+}
+
 
   // 📌 Obtener datos en tiempo real cada segundo usando hora local
   getLiveData() {
