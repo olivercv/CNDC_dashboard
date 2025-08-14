@@ -9,12 +9,15 @@ import { FrecuenciaComponent } from './frecuencia/frecuencia.component';
 import { InjectadaComponent } from './injectada/injectada.component';
 import { PieChartComponent } from './pie-chart/pie-chart.component';
 
+
 export const routes: Routes = [
 
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardMapComponent },
   { path: 'map-centrales', component: MapCentralesComponent },
+  { path: 'map-centrales/:id', component: MapCentralesComponent },
   { path: 'map-transferencias', component: MapTransferenciasComponent },
+  { path: 'map-transferencias/:id', component: MapTransferenciasComponent },
   { path: 'costo-marginal-real', component: CostoMarginalRealComponent },
   { path: 'demanda-tiempo-real', component: DemandaComponent },
   { path: 'generada-tiempo-real', component: GeneradaComponent },

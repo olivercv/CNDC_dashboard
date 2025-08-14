@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 type CodigosValidos = 'HIDRO' | 'TERMO' | 'EOL' | 'SOLAR' | 'BAGAZO' | 'TOT';
 @Component({
   selector: 'app-map-centrales',
@@ -41,11 +42,16 @@ export class MapCentralesComponent implements OnInit, OnDestroy {
   };
 
 
-  constructor(private http: HttpClient, private zone: NgZone) { }
+  constructor(private http: HttpClient, private zone: NgZone, private route: ActivatedRoute) { }
 
   ngOnInit(): void {
-    // this.fetchGenerators();
-    this.loadFallbackData();
+
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {    
+      this.fetchGenerators();
+     } else {
+      this.loadFallbackData();
+     }
     this.fetchData();
     this.startAutoRefresh();
   }

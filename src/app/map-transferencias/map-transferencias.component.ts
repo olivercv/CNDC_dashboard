@@ -1,7 +1,7 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { LiveDataService } from '../services/live-data.service'
-
+import { ActivatedRoute } from '@angular/router';
 type RegionKey = 'norte' | 'este' | 'sur';
 
 interface LineData {
@@ -54,7 +54,8 @@ export class MapTransferenciasComponent implements OnInit {
   constructor(
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private liveDataService: LiveDataService
+    private liveDataService: LiveDataService,
+    private route: ActivatedRoute
   ) { }
 
   ngOnInit(): void {
@@ -62,9 +63,12 @@ export class MapTransferenciasComponent implements OnInit {
   this.frequency = `${data.frequency.toFixed(2)} Hz`; // 2 decimales
   this.dateTime = new Date(data.timestamp).toLocaleString('es-BO'); // hora local
 });
-
-    // this.fetchData();
-    this.loadFallbackData();
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.fetchData();
+    } else {
+      this.loadFallbackData();
+    }
   }
 
   
