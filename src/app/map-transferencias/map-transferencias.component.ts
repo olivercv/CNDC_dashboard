@@ -59,7 +59,7 @@ export class MapTransferenciasComponent implements OnInit {
 
   ngOnInit(): void {
     this.liveDataService.getLiveData().subscribe(data => {
-  this.frequency = `${data.frequency.toFixed(3)} Hz`; // 3 decimales
+  this.frequency = `${data.frequency.toFixed(2)} Hz`; // 2 decimales
   this.dateTime = new Date(data.timestamp).toLocaleString('es-BO'); // hora local
 });
 
