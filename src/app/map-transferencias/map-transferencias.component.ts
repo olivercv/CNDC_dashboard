@@ -65,9 +65,9 @@ export class MapTransferenciasComponent implements OnInit {
 });
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
-      this.fetchData();
-    } else {
       this.loadFallbackData();
+    } else {
+      this.fetchData();
     }
   }
 
@@ -333,10 +333,10 @@ private showTooltip(event: MouseEvent, text: String, info: String, activo: Strin
               <b>Transferencia:</b><span>${text}</span>
           </div>
           <div class="tooltip-row">
-              <b>Potencia activa:</b><span>${activo}</span>
+              <b>Potencia Activa:</b><span>${activo}</span>
           </div>
           <div class="tooltip-row">
-              <b>Potencia reactiva:</b><span>${reactivo}</span>
+              <b>Potencia Reactiva:</b><span>${reactivo}</span>
           </div>
       `;
 

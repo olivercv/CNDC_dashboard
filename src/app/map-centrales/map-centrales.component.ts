@@ -47,10 +47,10 @@ export class MapCentralesComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
 
     const id = this.route.snapshot.paramMap.get('id');
-    if (id) {    
-      this.fetchGenerators();
+    if (id) {  
+      this.loadFallbackData();    
      } else {
-      this.loadFallbackData();
+      this.fetchGenerators();
      }
     this.fetchData();
     this.startAutoRefresh();
@@ -178,13 +178,13 @@ private procesarDatos(data: any[]) {
                             <b>${info}</b>
                         </div>
                         <div class="tooltip-row">
-                            <b>Potencia activa:</b><span>${potencia_activa}</span>
+                            <b>Potencia Activa:</b><span>${potencia_activa}</span>
                         </div>
                         <div class="tooltip-row">
-                            <b>Potencia reactiva:</b><span>${potencia_reactiva}</span>
+                            <b>Potencia Reactiva:</b><span>${potencia_reactiva}</span>
                         </div>
                         <div class="tooltip-row">
-                            <b>Capacidad instalada:</b><span>${capacidad_instalada || ''}</span>
+                            <b>Capacidad Instalada:</b><span>${capacidad_instalada || ''}</span>
                         </div>
                     `;
                     tooltip.style.opacity = '1';
