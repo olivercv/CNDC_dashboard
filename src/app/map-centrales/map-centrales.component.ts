@@ -184,7 +184,7 @@ private procesarDatos(data: any[]) {
                             <b>Potencia Reactiva:</b><span>${potencia_reactiva}</span>
                         </div>
                         <div class="tooltip-row">
-                            <b>Capacidad Instalada:</b><span>${capacidad_instalada || ''}</span>
+                            <b>Capacidad Efectiva:</b><span>${capacidad_instalada || ''}</span>
                         </div>
                     `;
                     tooltip.style.opacity = '1';

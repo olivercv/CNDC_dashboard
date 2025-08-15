@@ -330,9 +330,6 @@ private showTooltip(event: MouseEvent, text: String, info: String, activo: Strin
               <b>${info}</b>
           </div>
           <div class="tooltip-row">
-              <b>Transferencia:</b><span>${text}</span>
-          </div>
-          <div class="tooltip-row">
               <b>Potencia Activa:</b><span>${activo}</span>
           </div>
           <div class="tooltip-row">
