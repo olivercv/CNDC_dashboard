@@ -90,8 +90,8 @@ export class DemandaComponent implements OnInit, OnDestroy {
   }
 
   fetchData() {
-    const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
-    const dataApiUrl = 'https://cndcapi.cndc.bo/WebApi?code=1&Fecha=';
+    const fechaApiUrl = 'https://webapi.cndc.bo/WebApiFechas';
+    const dataApiUrl = 'https://webapi.cndc.bo/WebApi?code=1&Fecha=';
 
     this.http.get<any[]>(fechaApiUrl).subscribe({
       next: (fechas) => {

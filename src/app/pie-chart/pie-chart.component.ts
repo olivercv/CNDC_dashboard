@@ -82,7 +82,7 @@ export class PieChartComponent implements OnInit {
   }
 
   fetchData() {
-    const apiUrl = 'https://cndcapi.cndc.bo/WebNoDate?code=1';
+    const apiUrl = 'https://webapi.cndc.bo/WebNoDate?code=1';
     this.http.get<any[]>(apiUrl).subscribe({
       next: (data) => {
         // Filtrar el item "TOTAL" si no deseas mostrarlo

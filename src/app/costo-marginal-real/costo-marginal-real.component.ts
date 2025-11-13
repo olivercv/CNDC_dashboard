@@ -51,7 +51,7 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
   }
 
   fetchData() {
-    const fechaApiUrl = 'https://cndcapi.cndc.bo/WebApiFechas';
+    const fechaApiUrl = 'https://webapi.cndc.bo/WebApiFechas';
     const code = 5; // POSTDESPACHO
 
     this.http.get<any[]>(fechaApiUrl).subscribe({
@@ -64,7 +64,7 @@ export class CostoMarginalRealComponent implements OnInit, OnDestroy {
         const baseDate = Date.UTC(year, month - 1, day, 0, 0, 0); // timestamp en ms UTC
 
         const formattedDate = this.formatDate(postdespachoDate); // dd/MM/yyyy
-        const dataApiUrl = `https://cndcapi.cndc.bo/WebApi?code=${code}&Fecha=${formattedDate}`;
+        const dataApiUrl = `https://webapi.cndc.bo/WebApi?code=${code}&Fecha=${formattedDate}`;
 
         this.http.get<any[]>(dataApiUrl).subscribe({
           next: (apiData) => {
