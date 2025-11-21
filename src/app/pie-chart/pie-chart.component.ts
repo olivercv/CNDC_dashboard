@@ -30,8 +30,12 @@ export class PieChartComponent implements OnInit {
         alpha: 45,
         beta: 0,
       },
-      marginTop: 50,
-      marginBottom: 50,
+      height: '100%',
+      reflow: true,
+      marginTop: 40,
+      marginBottom: 40,
+      marginLeft: 10,
+      marginRight: 10,
     },
     title: {
       text: 'Capacidad Efectiva del SIN',
@@ -48,7 +52,7 @@ export class PieChartComponent implements OnInit {
     credits: { enabled: false },
     plotOptions: {
       pie: {
-        size: '70%',
+        size: '85%',
         allowPointSelect: true,
         cursor: 'pointer',
         depth: 35,
@@ -57,7 +61,7 @@ export class PieChartComponent implements OnInit {
           format: '{point.name}',
           distance: 10,
           style: {
-            fontSize: '10px',
+            fontSize: '11px',
             color: '#000',
           },
         },

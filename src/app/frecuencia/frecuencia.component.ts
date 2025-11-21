@@ -20,7 +20,7 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
   chartCallback!: (chart: Highcharts.Chart) => void;
   chartRef!: Highcharts.Chart;
   private dataPoints: number[][] = [];
-  private readonly maxSeconds = 50;
+  private readonly maxSeconds = 360;
   private liveDataSubscription!: Subscription;
   errorMessage: string | null = null;
 
@@ -85,7 +85,9 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
     return {
       chart: {
         type: 'spline',
-        animation: true
+        animation: true,
+        reflow: true,
+        height: null
       },
       title: {
         text: 'Frecuencia en Tiempo Real',
@@ -97,11 +99,17 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
       },
       xAxis: {
         type: 'datetime',
+        tickPixelInterval: 80,
         labels: {
           formatter: function () {
             return new Date(this.value as number).toLocaleTimeString('es-ES', {
               hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
             });
+          },
+          rotation: -45,
+          align: 'right',
+          style: {
+            fontSize: '11px'
           }
         },
         title: { text: 'Hora' }
