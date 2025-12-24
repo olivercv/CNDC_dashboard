@@ -16,8 +16,8 @@ export class DashboardMapComponent {
 
   // Tabs de la columna izquierda
     leftTabs = [
-      { label: 'Generación de Energía', component: GeneradaComponent },
-      { label: 'Demanda de Energía', component: DemandaComponent },
+      { label: 'Generación en tiempo real', component: GeneradaComponent },
+      { label: 'Demanda en tiempo real', component: DemandaComponent },
       { label: 'Frecuencia', component: FrecuenciaComponent }
       
     ];

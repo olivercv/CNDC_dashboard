@@ -76,7 +76,7 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
       if (shouldShift) this.dataPoints.shift();
 
       this.chartRef.setSubtitle({
-        text: `Actualizado: ${this.datePipe.transform(new Date(), 'dd-MM-yy HH:mm:ss')}`
+        text: `Fecha: ${this.datePipe.transform(new Date(), 'dd/MM/yyyy')} Hora: ${this.datePipe.transform(new Date(), 'HH:mm:ss')}`
       });
     });
   }
@@ -94,7 +94,7 @@ export class FrecuenciaComponent implements OnInit, OnDestroy {
         style: { fontSize: '20px', color: '#2c3e50' }
       },
       subtitle: {
-        text: `Inicializado: ${this.datePipe.transform(new Date(), 'dd-MM-yy HH:mm:ss')}`,
+        text: `Fecha: ${this.datePipe.transform(new Date(), 'dd/MM/yyyy')} Hora: ${this.datePipe.transform(new Date(), 'HH:mm:ss')}`,
         style: { fontSize: '14px', color: '#2c3e50' }
       },
       xAxis: {

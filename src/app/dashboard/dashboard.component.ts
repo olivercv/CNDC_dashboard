@@ -31,8 +31,8 @@ export class DashboardComponent {
 
   // Tabs de la columna central
   centerTabs = [
-    { label: 'Generacion de Energía', component: GeneradaComponent },
-    { label: 'Demanda de Energía', component: DemandaComponent }
+    { label: 'Generacion en tiempo real', component: GeneradaComponent },
+    { label: 'Demanda en tiempo real', component: DemandaComponent }
   ];
 
   // Tabs de la columna derecha
