@@ -8,6 +8,7 @@ import { GeneradaComponent } from './generada/generada.component';
 import { FrecuenciaComponent } from './frecuencia/frecuencia.component';
 import { InjectadaComponent } from './injectada/injectada.component';
 import { PieChartComponent } from './pie-chart/pie-chart.component';
+import { TablaCapacidadComponent } from './tabla-capacidad/tabla-capacidad.component';
 
 
 export const routes: Routes = [
@@ -24,4 +25,5 @@ export const routes: Routes = [
   { path: 'frecuencia', component: FrecuenciaComponent },
   { path: 'injectada', component: InjectadaComponent },
   { path: 'capacidad-efectiva', component: PieChartComponent },
+  { path: 'tabla-capacidad', component: TablaCapacidadComponent },
 ];
