@@ -92,7 +92,8 @@ export class GeneradaComponent implements OnInit, OnDestroy {
             let seriesData = data.map((item) => ({
               name: item.codigo,
               data: item.valores.map((val: number, index: number) => {
-                const timestamp = baseDate.getTime() + index * 900000;
+                // El primer valor del array corresponde a 00:15, así que sumamos 15 minutos (900000 ms) al inicio
+                const timestamp = baseDate.getTime() + 900000 + index * 900000;
 
                 return [timestamp, val === -1 ? null : val];
               }),
@@ -108,8 +109,8 @@ export class GeneradaComponent implements OnInit, OnDestroy {
             const xAxisOptions: Highcharts.XAxisOptions = {
               title: { text: 'Horas' },
               type: 'datetime',
-              min: baseDate.getTime(), // Eliminamos el ajuste de +900000 para empezar en 00:00 exacto
-              max: baseDate.getTime() + 86400000, // 24 horas después
+              min: baseDate.getTime(), // El eje X empieza en 00:00
+              max: baseDate.getTime() + 86400000, // Termina a las 24:00
               labels: {
                 format: '{value:%H:%M}',
                 formatter: function (
@@ -126,13 +127,17 @@ export class GeneradaComponent implements OnInit, OnDestroy {
               crosshair: { width: 1, color: '#ccc' },
               tickPositioner: ((min: number, max: number) => {
                 const positions: number[] = [];
-                const interval = 3600000 * 3;
+                const interval = 3600000 * 3; // Intervalos de 3 horas
 
+                // Empezar desde 00:00
                 positions.push(min);
 
+                // Agregar ticks cada 3 horas: 03:00, 06:00, 09:00, 12:00, 15:00, 18:00, 21:00
                 for (let i = min + interval; i < max; i += interval) {
                   positions.push(i);
                 }
+                
+                // Agregar el último tick en 24:00
                 positions.push(max);
                 return positions;
               }) as Highcharts.AxisTickPositionerCallbackFunction,
